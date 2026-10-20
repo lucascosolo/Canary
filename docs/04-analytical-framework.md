@@ -232,7 +232,14 @@ error (F-05) settles the workflow: automation proposes, people publish. Concrete
   including an adversarial pass that lists the best alternative explanations and the evidence
   that would distinguish them, before it is published;
 - disagreements among reputable sources are recorded as such in the evidence record and shown
-  to readers; Canary does not resolve them by majority.
+  to readers; Canary does not resolve them by majority;
+- naming is conservative (user decision of 2026-10-20, afternoon): assessments name
+  institutions, offices and organisations; a person is named only in official capacity and only
+  for a documented official act (a decree, a ruling, a vote, a public statement with the quote
+  and its source); allegations about a person's conduct beyond documented official acts are not
+  published in Canary's words and are at most linked to the reporting source with its evidence
+  category shown; every assessment is phrased as an opinion based on the disclosed, cited facts
+  on the same screen.
 
 ## 10. Worked examples (hypothetical)
 

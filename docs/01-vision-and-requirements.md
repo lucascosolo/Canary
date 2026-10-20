@@ -43,8 +43,10 @@ democracies, rights and peace are coming under strain, or recovering, and shows 
 
 Three audiences, in priority order for the first public release:
 
-1. **The informed public reader** who wants a five-minute daily picture of what changed, where,
-   why it matters and how sure anyone can be. Free, no login (user decision of 2026-10-20).
+1. **The user and a small circle of friends** who want a five-minute daily picture of what
+   changed, where, why it matters and how sure anyone can be. Behind a Cloudflare Access login
+   with an allow-list; not open to the public (user decision of 2026-10-20, afternoon,
+   superseding the morning's "free to access for everyone").
 2. **The investigator**: journalists, researchers, civil-society analysts, students, who want to
    go from a headline to a country, a situation, a source, a time series, a historical parallel,
    and leave with citations.
@@ -52,8 +54,8 @@ Three audiences, in priority order for the first public release:
    assessments, and maintains the historical library. A single-editor workflow at first; the data
    model does not preclude more editors later.
 
-Not an audience in the first release: governments or institutions needing alerts with service
-guarantees, and anyone wanting country-level probabilities.
+Not an audience: the general public (no public launch is planned), governments or institutions
+needing alerts with service guarantees, and anyone wanting country-level probabilities.
 
 ## 4. Primary use cases
 
@@ -104,7 +106,11 @@ The first public release targets L3 with parts of L4. L5 is a research goal, not
 - No full-text republication of articles or reports. Metadata, links, short excerpts and
   extracted claims with quoted spans only (note G-02).
 - No scraping that ignores robots.txt, paywalls, or machine-readable reuse reservations.
-- No user accounts for readers in the first release; no personalisation; no tracking beyond
+- No requests for credentials, tokens, permissions or data access from any organisation; only
+  sources usable without registration and with an explicit licence (document 03, section 8).
+- No retention of article full text after processing; metadata, one short quoted span per claim
+  and the extracted claim only. Open-licensed reports may be kept in full.
+- No reader accounts beyond the Access allow-list; no personalisation; no tracking beyond
   aggregate, privacy-preserving analytics.
 - No coverage of individuals' private lives. Actors are public officials, institutions,
   organisations and groups acting in public roles.
@@ -112,11 +118,14 @@ The first public release targets L3 with parts of L4. L5 is a research goal, not
 
 ## 8. Constraints
 
-- Public hostname `canary.lucascosolo.com` on the user's Cloudflare-fronted infrastructure
-  (user input, 2026-10-20). Whether a beta gate (Cloudflare Access) precedes public launch is open.
-- Non-commercial, non-profit, free (user input, 2026-10-20). Source licences are evaluated for
-  exactly that use; a future commercial turn would require re-evaluation of roughly a third of
-  the catalog (document 03).
+- Hostname `canary.lucascosolo.com` on the user's Cloudflare zone, permanently behind
+  Cloudflare Access with a friends allow-list (user input, 2026-10-20).
+- Personal, non-commercial, published under the user's own name, no legal entity (user input,
+  2026-10-20, afternoon). Source licences are evaluated for exactly that use; a public or
+  commercial turn would require re-evaluation of the catalog (document 03).
+- Legal exposure minimised by construction (document 04, section 9; document 07, section 5):
+  open-licensed data only, short quotations only, conservative naming, honoured reuse
+  reservations, a disclaimer and a corrections contact.
 - One operator, developing with Claude Code, with compute on one workstation and light VPSes
   (machine context). The architecture must run on modest hardware and tolerate the operator
   being away for days.
@@ -137,7 +146,7 @@ does this for improvement as carefully as for deterioration, and it says where i
 
 ## 10. Success criteria
 
-For the first public release (end of Phase 3 in document 10):
+For the first shared release (end of Phase 3 in document 10):
 
 - Every item on the Today view answers the eight questions and links to raw evidence within two clicks.
 - Every country page shows a coverage index, a freshness stamp per source, and an explicit
@@ -150,7 +159,9 @@ For the first public release (end of Phase 3 in document 10):
   its results published on the methodology page.
 - At least twelve historical episodes are in the library with cited milestones, including at
   least four cases of reversal or resilience.
-- A corrections log is public and every correction distinguishes source correction from Canary error.
-- Source licences in the catalog are all satisfied for a public non-commercial site, with the
-  attribution text rendered where each source requires it.
+- A corrections log is visible to readers and every correction distinguishes source correction
+  from Canary error.
+- Every integrated source is usable without registration, has an explicit licence permitting
+  storage and display for personal non-commercial use, and has its attribution text rendered
+  where it requires it; everything else is a link.
 - Monthly running cost is within the budget the user approves in document 11.

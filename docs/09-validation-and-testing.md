@@ -111,12 +111,12 @@ quarterly restore drill from the storage VPS backup is an acceptance item for Ph
 ## 9. Performance and experience
 
 Budgets: Today first screen under 150 KB and under 1.5 s server render on the target host;
-country page under 2.5 s; API p95 under 500 ms for cached resources. Load test at the edge
-before public launch. Accessibility audit (keyboard-only pass of every view; screen-reader pass
-of Today and a situation page; contrast check in both themes). A small reader test (five
-people, three of them unfamiliar with the domain) before launch: can they find the evidence
-behind an item in under a minute, and do they correctly read the confidence and coverage
-labels? Their misreadings become copy changes.
+country page under 2.5 s; API p95 under 500 ms for cached resources. No load test is needed for a
+friends-only site behind Cloudflare Access. Accessibility audit (keyboard-only pass of every view;
+screen-reader pass of Today and a situation page; contrast check in both themes). A small reader
+test with three to five friends before the link is shared more widely: can they find the evidence
+behind an item in under a minute, and do they correctly read the confidence and coverage labels?
+Their misreadings become copy changes.
 
 ## 10. The public calibration log
 
@@ -129,8 +129,6 @@ before any watch rule is enabled.
 
 ## 11. External review
 
-Before public launch and yearly after: an invited read of the framework, the rule set and a
-sample of assessments by two or three people with domain standing (comparative politics,
-atrocity prevention, OSINT verification), with their comments published alongside the response.
-Not a gate on publishing (suite rule: a second opinion is a tool, not a gate), but a recorded
-input.
+Not planned (user decision of 2026-10-20, afternoon: a personal tool shared with friends). If a
+friend with domain standing offers a read, their comments go into the calibration log as a
+recorded input, never as a gate.

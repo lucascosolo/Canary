@@ -34,7 +34,9 @@ versioned vocabulary files.
   source's own correction is recorded.
 - **document_text** (append-only per normaliser version): `document_id`, `normaliser_version`,
   `text`, `paragraph_offsets`, `run_id`. Stored only where `licence_mode` allows; otherwise only
-  the quoted spans survive in claims.
+  the quoted spans survive in claims. For news feeds `licence_mode` defaults to `excerpt`: the
+  body is processed in memory and discarded, and the retained record is metadata, digests and
+  the quoted spans (document 03, section 8).
 - **document_translation** (append-only): `document_id`, `field` (title, span), `span_ref`,
   `target_language`, `text`, `engine` (madlad, claude), `engine_version`, `run_id`.
 - **dataset_release** (append-only): `source_id`, `version_label`, `released_at` (stated),

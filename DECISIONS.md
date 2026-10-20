@@ -87,3 +87,30 @@ assumptions, each put to the user in `docs/11-risks-and-open-questions.md` secti
 
 Superseded entries: "Repository initialised locally; remote deferred" is superseded by the
 remote entry above.
+
+## 2026-10-20 — Audience, access and legal posture revised (user input, afternoon)
+
+Recorded from the user on 2026-10-20 (13:07 CDT): "I'd rather just publish it under my name as a
+little web tool to share with friends. I'm not requesting official permission, access or tokens
+from any entities, and I don't want this to do anything that might get me in legal trouble."
+
+This supersedes the morning entry "free, public, non-commercial, non-profit" on three points and
+keeps the rest:
+
+- Audience: the user and a small circle of friends, behind Cloudflare Access with an allow-list.
+  Not open to the public. No legal entity, no external reviewers, no launch gate; "launch" means
+  sharing the link.
+- Sources: only those usable without registration, credentials, tokens or permission, and only
+  those whose licence is explicit and permits storage and display for personal non-commercial
+  use. Everything else is a link. No emails or forms to any organisation. A token from the
+  user's own existing account (Cloudflare) is the one exception, and the user may strike it.
+- Legal posture: minimise exposure rather than consult a lawyer. Concretely: no article full text
+  retained after processing (metadata, a short quoted span and the extracted claim only);
+  robots.txt and machine-readable reuse reservations honoured; no paywall or login circumvention;
+  licensed-open datasets only; assessments name institutions and offices, and individuals only
+  in official capacity for documented official acts; no allegations about individuals beyond
+  what a legal finding or official document states; a visible disclaimer and a contact for
+  corrections.
+
+Consequences applied in `docs/01`, `03`, `04`, `07`, `09`, `10`, `11`, `12` as a dated revision.
+Hosting moves to the existing utility VPS (no new spend) with heavy steps on this PC.

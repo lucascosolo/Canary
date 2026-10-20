@@ -119,16 +119,18 @@ Chosen for open licences, programmatic access without negotiation, and coverage 
 layers in document 04:
 
 1. **V-Dem v16 with ERT**: the baseline layer and the episode list. Annual; one adapter.
-2. **UCDP Candidate (monthly) and GED/ACD (annual)**: the conflict-event layer. Token requested
-   by email to the API maintainer in the user's name (needs the user's say-so; document 11).
+2. **UCDP Candidate (monthly) and GED/ACD (annual)**: the conflict-event layer, from the bulk
+   CSV downloads only (CC BY 4.0, no token). The API, which needs a token by email, is not used.
 3. **World Bank Indicators API and Our World in Data**: the economic and social context layer.
 4. **EWP Statistical Risk Assessment CSV and Cline Center coups**: external structural risk and
    an outcome series for backtests.
 5. **GDELT DOC API**: attention-volume time series per country and theme, and URL discovery for
    the news layer; never displayed as events.
-6. **Cloudflare Radar outage annotations**: the first information-controls feed, using the
-   user's existing Cloudflare account.
-7. **ReliefWeb API**: humanitarian reports as documents.
+6. **Cloudflare Radar outage annotations**: the first information-controls feed, using a token
+   from the user's own existing Cloudflare account (no request to a third party; the user may
+   strike this item, in which case OONI and #KeepItOn carry the role).
+7. ReliefWeb is withdrawn: its API requires a pre-approved app name (B-06). Humanitarian
+   context comes from the open datasets above and from NGO feeds under their own terms.
 8. **A curated RSS list** of roughly 200 outlets and NGO feeds spanning every region and at least
    twelve languages, plus the Global Legal Monitor feed: the document layer for claim extraction.
    The list itself is a versioned file in the repository with a reason and a language for each
@@ -136,10 +138,13 @@ layers in document 04:
 9. **Reference data**: GeoNames, Wikidata, Natural Earth, ISO codes.
 10. **Archival**: Internet Archive availability check and save-on-cite.
 
-Deferred to Phase 2-3 on purpose: Freedom House (request flow), CIVICUS and RSF (licences to
-read), OpenSanctions, UNHCR (licence to read), IMF SDMX (auth to confirm by a live call), IPU
-Parline and ElectionGuide (credentials), OONI and #KeepItOn, national legislative APIs, Media
-Cloud, SIPRI, ViEWS.
+Deferred to Phase 2-3: CIVICUS and RSF (licences to read; links until then), OpenSanctions bulk
+files (no key, CC BY-NC), UNHCR (licence to read), OONI and #KeepItOn, SIPRI within its fair-use
+clause, ViEWS (licence to read), the keyless legislative sources (EUR-Lex SPARQL, Brazil's Câmara
+API, the French Assembly's open data). Withdrawn under the policy in section 8: Freedom House
+(data by request), ElectionGuide (credentials), Media Cloud (account), IMF SDMX (auth
+unconfirmed), IPU Parline's API (until confirmed keyless), Congress.gov and Bundestag DIP (keys),
+HDX HAPI (app identifier), ACAPS (registration), IOM DTM, ReliefWeb.
 
 ## 7. The source registry
 
@@ -172,3 +177,33 @@ The registry is itself a public page (document 06): readers can see what Canary 
 fresh each feed is, and what each licence permits. A source whose health check fails for longer
 than its expected lag is shown as stale on every page that uses it, and the coverage index for
 affected countries drops accordingly (document 04, section 6).
+
+## 8. No-credentials, minimal-legal-risk policy (revision of 2026-10-20, afternoon)
+
+The user's afternoon decision (DECISIONS.md) narrows the catalog. Rules applied from now on:
+
+1. A source is integrated only if it is usable without registration, API key, token, account,
+   credentials or written permission. Self-service keys from organisations other than the
+   user's own existing accounts count as credentials and are not requested. The one standing
+   exception is a token from the user's own Cloudflare account, which the user may withdraw.
+2. A source is stored and displayed only if its licence is explicit and permits storage and
+   display for personal non-commercial use (open, display with attribution, or CC BY-NC
+   family). "Unverified" sources are links: title, URL and date only, no stored content.
+3. News articles are processed in memory: the retained record is the URL, title, publisher,
+   date, language, content digest, and for each extracted claim one quoted span of at most two
+   sentences. Full text is not retained unless the publisher's licence is open (CC family or
+   equivalent). Robots.txt and machine-readable reuse reservations are honoured; no paywall or
+   login is circumvented; no site is fetched more often than once an hour per feed.
+4. Datasets with "no redistribution" or "display unchanged only" terms (CPI, Polity, PITF, COW,
+   GTD, SIPRI beyond fair use) are not mirrored. CPI is shown unchanged with attribution or linked.
+5. Reuse of Common Crawl content is excluded (its terms place copyright risk and an AI-use
+   indemnity on the user).
+6. Every page carries attribution for every source it draws on, a disclaimer that the site is a
+   personal, non-commercial tool presenting opinions based on cited public sources, and a
+   contact address for corrections.
+
+Catalog consequences: P0 after revision is V-Dem (with ERT), UCDP bulk, World Bank, Our World in
+Data, EWP SRA, Cline coups, GDELT (volume and URL discovery), Cloudflare Radar (conditional),
+OONI, #KeepItOn, the curated RSS list, the Global Legal Monitor feed, reference data, and the
+Internet Archive. Everything that needed a request is withdrawn or links-only as listed in
+section 6.

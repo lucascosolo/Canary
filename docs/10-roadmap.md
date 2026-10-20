@@ -21,8 +21,7 @@ World Bank Indicators, Our World in Data, EWP SRA, Cline Center coups, and the r
 (GeoNames, Natural Earth, ISO, a seed Wikidata alias table); a `canary` CLI (`status`, `ingest
 <source>`, `health`); the reproducibility test; JUnit reporting; `.agent/state.json` conventions.
 
-Prerequisites: the user's answers in document 11 to the questions marked "affects Phase 0"
-(none block it except the choice to request a UCDP token).
+Prerequisites: none external. No tokens or requests of any kind (DECISIONS.md, afternoon entry).
 
 Major decisions already taken: stack (document 07); vintage-mandatory observations; registry as
 YAML in the repository.
@@ -44,9 +43,10 @@ Objective: the text pipeline from feeds to validated claims, measured against a 
 a measured cost.
 
 Delivers: the curated feed list (about 200 outlets and NGO feeds, at least twelve languages, each
-entry with a reason) as a versioned file; feed, ReliefWeb, GDELT DOC (volume and URL discovery)
-and Cloudflare Radar adapters; the fetcher with robots.txt, reuse-reservation and `licence_mode`
-handling and Internet Archive save-on-cite; normalisation (trafilatura, Lingua, courlan,
+entry with a reason) as a versioned file; feed, GDELT DOC (volume and URL discovery), OONI,
+#KeepItOn and, if the user keeps it, Cloudflare Radar adapters; the fetcher with robots.txt,
+reuse-reservation and `licence_mode` handling, in-memory processing of article bodies with no
+full-text retention, and Internet Archive save-on-cite; normalisation (trafilatura, Lingua, courlan,
 dateparser, geocoding via mordecai3 and GeoNames); lineage clustering (MinHash plus attribution
 parsing plus quote matching) with the 500-pair labelled set; the claim vocabulary file; the
 extraction gold set for English (300 documents) coded by the operator; Haiku 5.5 extraction with
@@ -55,8 +55,7 @@ prompt-injection corpus and tests; translation of titles and spans with MADLAD-4
 local embeddings with bge-m3 pinned by digest; cost measurement against document 07, section 12.
 
 Prerequisites: Phase 0; the Anthropic API key in a mode-600 env file (user decision of
-2026-10-20 covers use; the key is the user's to place); ReliefWeb app-name approval requested
-(user go-ahead for external requests, document 11).
+2026-10-20 covers use; the key is the user's to place). No external requests.
 
 Major decisions in-phase: extraction model tier per claim type from the measurements; which
 languages make tier two; the lineage threshold.
@@ -74,8 +73,8 @@ set versions; the cost measurement; the test report.
 
 ## Phase 2: Indicators, signals, coverage, and the first interface (reaches L3 overall)
 
-Objective: the three layers visible for every country, honestly labelled, on a private beta at
-the public hostname.
+Objective: the three layers visible for every country, honestly labelled, at the hostname behind
+Cloudflare Access with the user as the only member of the allow-list.
 
 Delivers: the indicator catalog v1 (about twenty indicators across the domains, each with
 baseline and detection parameters), baselines at three horizons, change detection, the
@@ -84,18 +83,17 @@ disabled; the stable-period false-alarm review (ten country-years) and its calib
 entries; the SvelteKit application with Today, Map (tile-free), Country, Situation (read), Trends,
 Sources, Methodology and the corrections and calibration pages; the public API v1; the operator
 workspace (review queue, assessment editor with the eight fields and the checklist, source
-registry editor); deployment to the dedicated VPS behind Cloudflare Access with the heavy steps
+registry editor); deployment to the utility VPS behind Cloudflare Access with the heavy steps
 scheduled on this PC; backups to the storage VPS with a manifest entry and one restore drill.
 
-Prerequisites: Phase 1; the user's hosting decision and spend approval (document 11); the
-Cloudflare DNS and Access setup through the `cloudflare-control` skill; the `deploy` skill's guard.
+Prerequisites: Phase 1; the Cloudflare DNS and Access setup through the `cloudflare-control`
+skill (listing is safe, each record edit confirmed with the user); the `deploy` skill's guard.
 
 Major decisions in-phase: which rules are enabled after the review; the exceedance thresholds
 chosen by noise-to-signal on the available history; theme defaults.
 
 Difficulties: making the five channels (urgency, severity, confidence, trend, completeness)
-legible without a score; the operator's review queue depth; a public hostname before public
-launch (the Access gate handles it).
+legible without a score; the operator's review queue depth; keeping the utility VPS light.
 
 Acceptance: every Today item answers the eight questions and links to evidence in two clicks;
 every country page shows the coverage label and freshness per source; no composite number
@@ -106,28 +104,27 @@ run on the deployed modules; accessibility keyboard pass.
 Evidence: screenshots of the eight-question card and a situation page committed under
 `docs/evaluations/`; the false-alarm review entries; the deploy ledger.
 
-## Phase 3: History, comparisons, and public launch (reaches L4 in part)
+## Phase 3: History, comparisons, and sharing with friends (reaches L4 in part)
 
-Objective: the historical layer and the editorial workflow complete enough to publish to the
-world, with the legal and reader checks done.
+Objective: the historical layer and the editorial workflow complete enough to share the link
+with friends, with the reader check done and the content rules of document 04 section 9 enforced.
 
 Delivers: twelve or more episodes with cited milestones (at least four reversal or resilience
 cases); the comparison editor with the Neustadt-May fields and the required sentence; the
 deterministic matcher and its outcome-blind test; the assessment workflow with Claude drafts
 tied to claim identifiers and the review checklist enforced; the corrections and calibration
-logs populated; attribution rendering audited source by source; the additional sources whose
-licences were confirmed in the meantime (Freedom House, CIVICUS, RSF, OpenSanctions, UNHCR, IPU
-Parline, ElectionGuide, OONI, #KeepItOn); the media-lawyer consultation and its outcome recorded;
-the five-reader test and the copy changes it produced; the accessibility audit in both themes;
-the external read (document 09, section 11) invited.
+logs populated; attribution rendering audited source by source; the disclaimer and corrections
+contact on every page; the additional keyless sources whose licences were confirmed by reading
+in the meantime (CIVICUS, RSF, OpenSanctions bulk, UNHCR, SIPRI within fair use); the
+friends reader test and the copy changes it produced; the accessibility audit in both themes.
 
-Prerequisites: Phase 2; the user's approval to publish (publishing gate); confirmed licences
-for each added source (written permission where the catalog says "permission").
+Prerequisites: Phase 2; the user's go to extend the Access allow-list to friends (the suite's
+publishing gate applies to that step); confirmed licences for each added source, by reading.
 
-Difficulties: operator time to write episodes well; the temptation to launch before the
-reversal cases are written (the acceptance criterion prevents it); legal review cost.
+Difficulties: operator time to write episodes well; the temptation to share before the
+reversal cases are written (the acceptance criterion prevents it).
 
-Acceptance: the success criteria of document 01, section 10, all met; the Access gate removed
+Acceptance: the success criteria of document 01, section 10, all met; the allow-list extended
 only after the user's explicit go.
 
 Evidence: the launch checklist with each criterion linked to its evidence; the first calibration
@@ -137,17 +134,16 @@ log entries; the reader-test notes.
 
 Objective: know how well the signals and rules would have done, publish it, and widen coverage.
 
-Delivers: the as-of replay harness (vintage queries, GDELT and Media Cloud date-bounded discovery,
-Internet Archive captures); backtests on twelve episodes and ten stable years with detection
-probability, lead time, false-alarm ratio and precision-recall per rule and method; rule tuning
-with every change logged; the symmetry and ablation tests; the external review responses
-published; language tiers two and three with their gold sets; national legislative adapters for
-the six jurisdictions with APIs and the `legislation` entity; Media Cloud integration; ViEWS and
-EWP shown as external models with their precision; JSON-LD export of the episode library; saved
-searches and watchlists for the operator; the first yearly re-read of episodes.
+Delivers: the as-of replay harness (vintage queries, GDELT date-bounded discovery, Internet
+Archive captures); backtests on twelve episodes and ten stable years with detection probability,
+lead time, false-alarm ratio and precision-recall per rule and method; rule tuning with every
+change logged; the symmetry and ablation tests; language tiers two and three with their gold
+sets; the keyless legislative sources (EUR-Lex SPARQL, Brazil's Câmara API, the French Assembly's
+open data) and the `legislation` entity; ViEWS and EWP shown as external models with their
+precision; JSON-LD export of the episode library; saved searches and watchlists for the operator;
+the first yearly re-read of episodes.
 
-Prerequisites: Phase 3; Media Cloud key; any permissions obtained (ACLED aggregates, IOM) if
-the user chose to ask.
+Prerequisites: Phase 3. No external requests.
 
 Acceptance: the calibration log carries the backtest results; no enabled rule lacks a backtest
 entry; tier-two extraction meets its targets; symmetry tests pass or their failures are logged

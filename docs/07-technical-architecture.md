@@ -33,7 +33,8 @@ periodic tasks for polling. Alternatives: Celery or Dramatiq (need Redis or Rabb
 second stateful system to run and back up), PGQueuer, pgmq. Procrastinate keeps the queue in the
 same database as the data it processes, so a job and its output commit together (F-01).
 
-**Database: PostgreSQL 18** (released 2025-09-25, supported to 2030; F-01) with extensions
+**Database: PostgreSQL 17 or 18** (18 released 2025-09-25, supported to 2030; 17 to 2029; the
+utility VPS already runs 17; F-01) with extensions
 pgvector 0.8 (HNSW, `halfvec` for 1024-dimensional embeddings), PostGIS 3.6 (country and admin
 polygons, point-in-polygon for geocoded claims), pg_trgm and the built-in text search with
 per-language configurations. Partitioned tables with BRIN indexes for observations and
@@ -156,9 +157,11 @@ are part of the test suite and of the extraction gold set (document 09, section 
 
 Four stores in one database, with different write rules (document 08 has the schema):
 
-- **raw** (append-only): documents with bytes or text, headers, URL, retrieval time, adapter
-  version; dataset releases as files on disk under `~/.cache/canary/raw/` in development and on
-  the server's data volume in production, referenced by content digest;
+- **raw** (append-only): for datasets and open-licensed documents, bytes or text with headers,
+  URL, retrieval time and adapter version, as files under `~/.cache/canary/raw/` in development
+  and on the server's data volume in production, referenced by content digest; for news
+  articles, metadata and digests only: the body is processed in memory and not retained
+  (document 03, section 8);
 - **normalised** (append-only per version): extracted text, language, digests, geocodes, with a
   pointer to the raw record and the normaliser version;
 - **derived** (versioned, never updated in place): claims, lineages, events, observations
@@ -202,16 +205,18 @@ per the machine context. For serving, three options were weighed:
 - **Production VPS (4 cores, 15 GB)**: has the capacity but is designated for the Hytale servers
   and "nothing heavy"; co-locating Canary's database and workers there breaks that rule and
   couples two unrelated services' uptime.
-- **A dedicated small VPS (about 4 vCPU, 8 GB, 80 GB disk)** from the user's existing provider:
-  the recommendation for Phase 2 onward. It runs Postgres, the API, the workers that are light
-  (fetching, parsing, rules), Caddy, and the Cloudflare tunnel; the heavy, batchable steps
-  (embedding, translation, backtests) run on this PC in a detached session and write results to
-  the server's database over Tailscale, with the pipeline designed so that a day without the PC
-  delays embeddings and translations (visible as "pending") but never stops ingestion, extraction
-  (which is API-bound) or publishing.
+- **A dedicated small VPS (about 4 vCPU, 8 GB, 80 GB disk)**: the fallback if the utility VPS
+  strains; it would cost money and is not planned.
 
-This is a spend decision and it is put to the user in document 11; until then Phases 0 and 1 run
-entirely on this PC with the public hostname unassigned. Deployment follows the suite's `deploy`
+Revised 2026-10-20 (afternoon): the audience is the user and friends behind Cloudflare Access,
+so the load is tiny and the **utility VPS** is the recommendation after all, at no new cost. It
+already runs Postgres 17 and the `cloudflared` tunnel that serves the user's other subdomains; it
+gains the pgvector and PostGIS extensions, the API, Caddy or a direct tunnel route, and the light
+workers (fetching, parsing, rules). The heavy, batchable steps (embedding, translation,
+extraction batches, backtests) run on this PC in a detached session and write results over
+Tailscale; a day without the PC delays those (visible as "pending") but never stops ingestion of
+datasets, rule evaluation or page rendering. The database is kept small by the no-full-text rule
+(document 03, section 8). Phases 0 and 1 run entirely on this PC. Deployment follows the suite's `deploy`
 skill and guard: build here, ship an artifact (a container image or a wheel plus a static
 frontend bundle), migrate with Alembic, restart a systemd unit; never build on the server.
 Secrets (API keys, tokens) live in mode-600 env files outside the repository, as the suite
@@ -278,7 +283,7 @@ whose expressions it shows.
 
 Storage growth at the same assumptions: text and metadata `3000*10 KB` = 29.3 MB/day, about 10.4 GB/year; embeddings `3000*1024*2 bytes` (halfvec) = 6.1 MB/day, about 2.24 GB/year; observations and derived tables are small by comparison.
 
-Other recurring costs: a dedicated VPS (section 8; price from the user's provider, not stated here), the domain and Cloudflare (already paid), hosted embeddings only if the local path is abandoned. Free-tier sources need no payment. Total external spend at the base case is dominated by the LLM line and is well under a hundred dollars a month at these volumes; the volumes themselves are the lever (fewer documents extracted, more rule-based pre-filtering) if the user sets a lower cap.
+Other recurring costs: none for hosting (the existing utility VPS, section 8), the domain and Cloudflare (already paid), hosted embeddings only if the local path is abandoned. Free-tier sources need no payment. Total external spend at the base case is dominated by the LLM line and is well under a hundred dollars a month at these volumes; the volumes themselves are the lever (fewer documents extracted, more rule-based pre-filtering) if the user sets a lower cap.
 
 ## 13. What is deliberately not built
 

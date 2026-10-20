@@ -8,16 +8,20 @@ re-run the discovery: the research notes and the specification are the record.
 
 - Product: a free, public, non-profit, evidence-first monitor; no composite scores; no
   autonomous publication; three layers shown side by side (documents 01 and 04).
-- Hosting target `canary.lucascosolo.com` on the user's Cloudflare zone; the host itself is a
-  pending spend decision (document 11, question 1). Phases 0 and 1 run on this PC only.
+- Audience: the user and friends, behind Cloudflare Access at `canary.lucascosolo.com`, hosted
+  on the existing utility VPS from Phase 2 with heavy steps on this PC; no new spend; no legal
+  entity; no external requests of any kind (DECISIONS.md, afternoon entry of 2026-10-20).
+  Phases 0 and 1 run on this PC only.
 - LLM provider: the Anthropic API (user, 2026-10-20). Default tiers: Haiku 5.5 for extraction
   and support checks, Sonnet 5.5 for drafts; model and prompt versions recorded on every run.
 - Stack: Python 3.13, FastAPI, SQLAlchemy 2.1, Alembic, Procrastinate, PostgreSQL 18 with
   pgvector and PostGIS, SvelteKit 3 with MapLibre 6, local bge-m3 embeddings and MADLAD-400
   translation (document 07).
 - Data model and append-only rules in document 08; validation targets in document 09.
-- Source policy: the catalog in document 03 with `canary_use` per source; ACLED, GTD, COW,
-  Manifesto, commercial news APIs and bulk UN documents are out or links-only.
+- Source policy: the catalog in document 03 with `canary_use` per source and the
+  no-credentials, minimal-legal-risk rules of its section 8; only keyless, explicitly licensed
+  sources are stored; news bodies are processed in memory and not retained; ACLED, GTD, COW,
+  Manifesto, ReliefWeb, commercial news APIs and bulk UN documents are out or links-only.
 - Repository: `main` on `github.com/lucascosolo/Canary`, pushed by URL because the sandbox
   cannot write `.git/config` (document 11, question 10).
 
@@ -35,9 +39,9 @@ implementer sessions, each with a contract and tests written first by `test-auth
 3. Observations with vintages: `indicator`, `observation` (partitioned), `baseline` tables, the
    as-of query helper, the vintage dedup rule, the reproducibility test harness.
 4. Dataset adapters, one chunk each: V-Dem Country-Year plus ERT (selected columns and
-   intervals); UCDP Candidate and GED/ACD bulk; World Bank Indicators API; Our World in Data;
-   EWP SRA CSV plus Cline coups; reference loads (GeoNames, Natural Earth, ISO, Wikidata alias
-   seed).
+   intervals); UCDP Candidate and GED/ACD bulk (no API); World Bank Indicators API (keyless);
+   Our World in Data; EWP SRA CSV plus Cline coups; reference loads (GeoNames, Natural Earth,
+   ISO, Wikidata alias seed).
 5. `canary status` and the first `DECISIONS.md` entries from the phase.
 
 Acceptance for the phase is in document 10. Do not start Phase 1's feed list or extraction
@@ -45,8 +49,8 @@ until Phase 0's acceptance evidence is committed.
 
 ## Before the first chunk
 
-- Ask the user the Phase 0 and Phase 1 questions from document 11 (spend cap, scope emphasis,
-  the UCDP and ReliefWeb requests). Phase 0 itself needs no external request.
+- Ask the user the remaining questions from document 11 (spend cap, scope emphasis, editorial
+  policy confirmation, output licences, name). Nothing is requested from any organisation, ever.
 - Confirm the Anthropic API key location (a mode-600 env file outside the repository) when
   Phase 1 begins, not before.
 - Read `~/.agents/context/machine.md` and `engineering.md` before writing any install or build
@@ -57,9 +61,11 @@ until Phase 0's acceptance evidence is committed.
 ## Constraints that do not change
 
 No `rm` in any form (quarantine instead); no force-push; no composite score; no model
-publishing anything; licence mode enforced at render; vintages on every observation; every
-derived row carries a run id; small commits pushed after each; `DECISIONS.md` for every choice;
-the three gates (spend, production deploy, external communication) need an explicit yes each time.
+publishing anything; licence mode enforced at render; no retained article text; no credentials
+or requests to any organisation; conservative naming (document 04, section 9); vintages on every
+observation; every derived row carries a run id; small commits pushed after each; `DECISIONS.md`
+for every choice; the three gates (spend, production deploy, external communication) need an
+explicit yes each time.
 
 ## Where things are
 

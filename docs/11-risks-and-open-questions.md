@@ -54,6 +54,9 @@
 
 ## 2. Decisions that need the user
 
+Revised the same afternoon (section 4): the user's input resolved questions 1, 3, 4, 8 and 11;
+questions 2, 5, 6, 7, 9 and 10 remain. The original list is kept for the record.
+
 Each is stated with the recommendation and what it affects. Answers go into `DECISIONS.md`.
 
 1. **Hosting and spend (affects Phase 2).** Approve a dedicated small VPS (about 4 vCPU, 8 GB)
@@ -104,3 +107,26 @@ fields, IPU Parline licence, Constitute, Freedom House request flow, RSF licence
 licence, OONI endpoints, IODA, Metaculus terms, V-Dem U-turn figures, the Admiralty doctrine
 text, ERT codebook variables, GTD's current regime, WJP licence, psdata.un.org contents,
 UNHCR terms.
+
+## 4. Revision of 2026-10-20 (afternoon): a personal tool shared with friends
+
+The user decided: publish under their own name as a small web tool for friends; request no
+permission, access or tokens from any entity; do nothing that risks legal trouble. Effects:
+
+- Resolved: question 1 (hosting: the existing utility VPS, no spend), 3 (Cloudflare Access is
+  permanent, with a friends allow-list), 4 (no requests of any kind; the Cloudflare Radar token
+  from the user's own account is the one optional exception), 8 (no legal entity), 11 (no
+  external reviewers).
+- Still open: 2 (spend cap: $100 a month recommended), 5 (scope emphasis), 6 (editorial policy,
+  now with the conservative naming rule in document 04, section 9), 7 (licences for Canary's own
+  code and text), 9 (name), 10 (the git remote command outside the sandbox).
+- Risk 1 (a wrong assessment harms someone) is reduced, not removed: a friends-only audience and
+  the content rules lower exposure, and publication to a small group is still publication. The
+  mitigations now in force are the ones a careful individual can apply without counsel:
+  open-licensed data only; short quotations; no retained article text; honoured reuse
+  reservations; institutions and offices named, individuals only in official capacity for
+  documented acts; opinions tied to cited facts on the same screen; a disclaimer and a corrections
+  contact; prompt correction when a source corrects itself. This is a design posture, not legal
+  advice; the user may still choose a short consultation at any point.
+- Risk 3 (licence breach) is reduced by the no-credentials rule: every integrated source is
+  explicitly licensed and usable without asking, and everything else is a link.
