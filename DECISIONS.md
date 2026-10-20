@@ -41,3 +41,16 @@ Entries here are assumptions the specification proceeds on. Each is also listed 
 `docs/11-risks-and-open-questions.md` with the question put to the user.
 
 (filled in as the specification is written)
+
+## 2026-10-20 — Audience and licensing posture: free, public, non-commercial, non-profit (user input)
+
+Recorded from the user on 2026-10-20: "this will just be a free to access dashboard for everyone,
+no commercial intent. Non profit." Consequences the specification takes from this: sources whose
+terms permit non-commercial use with attribution are in scope (Freedom House data, OpenSanctions
+under CC BY-NC, CPJ text under CC BY-NC-ND for links and citations); sources that forbid
+redistribution regardless of purpose (Polity5, PITF, EIU, ACLED raw events) are used only as
+backtesting inputs, as links, or after written permission; there is no login for readers, so the
+system must tolerate public load and must treat every published assessment as a public statement
+(human review before strong warnings, visible evidence, corrections traceable). Not decided by
+this input: whether the user wants a reader-facing "beta" gate (Cloudflare Access) during early
+phases, and what monthly budget the non-profit operation can bear.
