@@ -33,28 +33,26 @@ periodic tasks for polling. Alternatives: Celery or Dramatiq (need Redis or Rabb
 second stateful system to run and back up), PGQueuer, pgmq. Procrastinate keeps the queue in the
 same database as the data it processes, so a job and its output commit together (F-01).
 
-**Database: PostgreSQL 17 or 18** (18 released 2025-09-25, supported to 2030; 17 to 2029; the
-utility VPS already runs 17; F-01) with extensions
-pgvector 0.8 (HNSW, `halfvec` for 1024-dimensional embeddings), PostGIS 3.6 (country and admin
-polygons, point-in-polygon for geocoded claims), pg_trgm and the built-in text search with
-per-language configurations. Partitioned tables with BRIN indexes for observations and
-documents by month. Not used at first: TimescaleDB (Apache edition would be fine but the volumes
-do not need it), ParadeDB pg_search (AGPL, the first upgrade if multilingual BM25 ranking proves
-necessary), Apache AGE (maintained, but recursive SQL covers Canary's traversals), OpenSearch
-(only if measured query latency fails the budget at scale). The threshold is a judgement
-recorded here, not a documented limit (F-01).
+**Database: PostgreSQL 17** (the version already on the utility VPS, supported to 2029; F-01)
+with pg_trgm and the built-in text search with per-language configurations. Partitioned tables
+with BRIN indexes for observations and documents by month. Not used (lighter-stack decision of
+2026-10-20, 13:11 CDT): pgvector and any embedding index (duplicates are found by MinHash, search
+by Postgres full text), PostGIS (places resolve to ISO country and GeoNames admin-1 identifiers in
+Python; the map is static SVG), TimescaleDB, ParadeDB pg_search, Apache AGE, OpenSearch. Each is a
+documented upgrade path if a measured limit is hit (F-01).
 
-**Embeddings: local, open-weight.** bge-m3 (MIT, 1024 dimensions, 100+ languages) or
-Qwen3-Embedding-0.6B (Apache 2.0) run with sentence-transformers on this PC's CPU for the
-pipeline, pinned by model digest so the archive can be re-embedded reproducibly; a hosted model
-(Voyage or OpenAI) as a documented fallback. Cost is not the reason (hosted embeddings for the
-whole flow would be under a dollar a day, section 12); reproducibility is (F-04).
+**Embeddings: none in the first release.** Near-duplicate detection uses shingling and MinHash
+(datasketch) and search uses Postgres full text; both run on one core. If semantic search is
+wanted later, embeddings are computed on this PC with a pinned open-weight model (bge-m3 or
+Qwen3-Embedding-0.6B, F-04) and stored as plain arrays queried offline, or the hosted option is
+used; a vector index on the VPS is a Phase 4 decision, not a default.
 
-**Translation: selective and local first.** Language identification with Lingua (Apache 2.0;
-fastText's model is CC BY-SA). Titles, extracted claims and quoted spans are translated to
-English for display with MADLAD-400 (Apache 2.0) through CTranslate2 on this PC; full articles
-are not translated. Claude is the fallback for languages or passages where MADLAD's output fails
-a quality spot check. Original text is always kept and shown (F-04).
+**Translation: selective, via Claude Haiku.** Language identification with Lingua in its
+low-memory mode (Apache 2.0). Titles, extracted claims and quoted spans are translated to
+English for display by Haiku 5.5 in the same batch as extraction; full articles are not
+translated. No translation model runs on the VPS or on this PC. Original text is always kept and
+shown (F-04). The local MADLAD-400 route is the fallback if API translation cost ever matters;
+at the volumes in section 12 it does not.
 
 **LLM: the Anthropic API** (user decision, 2026-10-20). Claude Haiku 5.5 for bulk claim
 extraction and support checks, Claude Sonnet 5.5 for the harder tier and for assessment drafts,
@@ -63,15 +61,15 @@ that can wait an hour. Model identifier, prompt version and schema version are s
 run (section 11). Pricing used in section 12 is the Anthropic first-party table cached
 2026-10-06 in the `claude-api` reference.
 
-**Frontend: SvelteKit 3 on Svelte 5 with TypeScript**, server-side rendering for public pages,
-MapLibre GL JS 6 for the map with Natural Earth TopoJSON (tile-free) by default and self-hosted
-Protomaps PMTiles (ODbL produced work, OSM attribution) for zoomed views if ever needed,
-Observable Plot for sparklines and small multiples, ECharts 6 for the trend charts, TanStack Table
-9 for dense lists. All MIT, BSD or ISC, versions as of 2026-10-20 (F-03). Alternatives: Next.js 16
-and React 19 (heavier runtime, no advantage for a content-dense public site); HTMX plus Alpine
-(would simplify the operator workspace but not the map and chart interactions); Astro 7 (good for
-the methodology pages, which SvelteKit can also prerender). The deciding factor is a small
-bundle for a public site and one language (TypeScript) for all client code.
+**Frontend: server-rendered Jinja2 templates from FastAPI with HTMX 2 for partial updates**,
+a static SVG world map built from Natural Earth TopoJSON with D3 7, Observable Plot for
+sparklines and small multiples, ECharts 6 loaded only on the Trends pages, plain CSS with a
+small design-token file for the dark and light themes. No Node process on the server and no
+client build step beyond copying pinned, vendored scripts (all MIT, BSD or ISC; versions as of
+2026-10-20, F-03). This is the lighter-stack decision of 2026-10-20: one language, one process,
+one deployable. The alternative kept as the upgrade path is SvelteKit 3 with MapLibre 6, which
+the research priced out (F-03) and which becomes worth its Node runtime only if the map and
+charts need interactions HTMX cannot express.
 
 **Reverse proxy and edge: Caddy behind Cloudflare** (the lucascosolo.com zone the user already
 runs), Cloudflare caching for public JSON and pages, Cloudflare Access for the operator paths,
@@ -169,6 +167,10 @@ Four stores in one database, with different write rules (document 08 has the sch
 - **editorial** (versioned with history): assessments, episodes, source registry overrides,
   corrections; every edit creates a new version row and the previous stays readable.
 
+Article text older than the retention window (default 30 days) is reduced to metadata and
+spans by a nightly job; the database stays in the low single-digit gigabytes at the planned
+volumes.
+
 Backups: nightly `pg_dump` plus WAL archiving to the storage VPS through the suite's
 `storage-backup` protocol with a manifest entry; raw files synced the same way; a restore drill
 every quarter is a roadmap acceptance item.
@@ -208,15 +210,21 @@ per the machine context. For serving, three options were weighed:
 - **A dedicated small VPS (about 4 vCPU, 8 GB, 80 GB disk)**: the fallback if the utility VPS
   strains; it would cost money and is not planned.
 
-Revised 2026-10-20 (afternoon): the audience is the user and friends behind Cloudflare Access,
-so the load is tiny and the **utility VPS** is the recommendation after all, at no new cost. It
-already runs Postgres 17 and the `cloudflared` tunnel that serves the user's other subdomains; it
-gains the pgvector and PostGIS extensions, the API, Caddy or a direct tunnel route, and the light
-workers (fetching, parsing, rules). The heavy, batchable steps (embedding, translation,
-extraction batches, backtests) run on this PC in a detached session and write results over
-Tailscale; a day without the PC delays those (visible as "pending") but never stops ingestion of
-datasets, rule evaluation or page rendering. The database is kept small by the no-full-text rule
-(document 03, section 8). Phases 0 and 1 run entirely on this PC. Deployment follows the suite's `deploy`
+Revised 2026-10-20 (afternoon, then 13:11 CDT): the audience is the user and friends behind
+Cloudflare Access, so the load is tiny and the **utility VPS** is the recommendation at no new
+cost, with the stack lightened so that everything on the critical path runs there. It already
+runs Postgres 17 and the `cloudflared` tunnel that serves the user's other subdomains; it gains
+a database, one uvicorn process serving pages and the operator workspace, one Procrastinate
+worker process doing fetching, parsing, MinHash, API calls to Anthropic, rules and rendering
+jobs, and a tunnel route. Resource budget: Postgres shared buffers raised modestly (256 MB), the
+web process about 150 MB, the worker about 250 MB without spaCy or any local model (language
+identification with Lingua's low-memory mode; actor and place strings come from the extraction
+output and resolve against a small alias table and a GeoNames admin-1 subset held in Postgres);
+about 1 GB in total, leaving the other services their share of the 3 GB. Concurrency: two
+outbound fetches and two Anthropic calls at a time; feeds polled hourly; extraction volume
+capped at about 800 documents a day. This PC is optional: backtests, gold-set evaluation and any
+bulk reprocessing run here in a detached session against a database copy, never on the critical
+path. Phases 0 and 1 run entirely on this PC; Phase 2 deploys to the VPS. Deployment follows the suite's `deploy`
 skill and guard: build here, ship an artifact (a container image or a wheel plus a static
 frontend bundle), migrate with Alembic, restart a systemd unit; never build on the server.
 Secrets (API keys, tokens) live in mode-600 env files outside the repository, as the suite
@@ -259,36 +267,37 @@ Corrections (document 08) are records, not edits.
 
 ## 12. Cost model
 
-Assumptions, to be replaced by measurements in Phase 1: 20,000 documents a day discovered;
-3,000 fetched; 2,000 sent to claim extraction at about 1,500 input and 350 output tokens each;
-about three claims per document, each support-checked at 600 input and 100 output tokens; 20
-assessment drafts a day at 8,000 input and 1,500 output tokens; 500 translation fallbacks a day
-at 200 input and 100 output tokens. Prices are the Anthropic first-party table cached 2026-10-06
-(Haiku 5.5 $0.10 input and $0.50 output per million tokens for prompts under 100K; Sonnet 5.5 $2
-and $10; Opus 5.5 $4 and $20; Batch API at half price). Prompt caching of the instruction block
-would lower input cost further and is not counted. The table below was produced by the script
-whose expressions it shows.
+Assumptions for the lightened stack (revised 2026-10-20, 13:11 CDT), to be replaced by
+measurements in Phase 1: 8,000 documents a day discovered; 1,200 fetched; 800 sent to claim
+extraction at about 1,500 input and 350 output tokens each; about three claims per document,
+each support-checked at 600 input and 100 output tokens; 10 assessment drafts a day at 8,000
+input and 1,500 output tokens; translation of titles and spans for 800 documents a day at 300
+input and 150 output tokens. Prices are the Anthropic first-party table cached 2026-10-06 (Haiku
+5.5 $0.10 input and $0.50 output per million tokens; Sonnet 5.5 $2 and $10; Batch API at half
+price). Prompt caching of the instruction block would lower input cost further and is not
+counted. The table was produced by the script whose expressions it shows.
 
 | Item | Expression (USD/day) | USD/day | USD/month (30 d) |
 |---|---|---|---|
-| Claim extraction, 2,000 docs/day, Haiku 5.5 | `2000*1500/1e6*0.10 + 2000*350/1e6*0.50` | 0.65 | 19.50 |
-| Support checks, 6,000/day, Haiku 5.5 | `6000*600/1e6*0.10 + 6000*100/1e6*0.50` | 0.66 | 19.80 |
-| Assessment drafts, 20/day, Sonnet 5.5 | `20*8000/1e6*2 + 20*1500/1e6*10` | 0.62 | 18.60 |
-| Translation fallback, 500/day, Haiku 5.5 | `500*200/1e6*0.10 + 500*100/1e6*0.50` | 0.04 | 1.05 |
-| Hosted embeddings if used instead of local, 3,000 docs/day at 1,000 tokens, $0.02/M | `3000*1000/1e6*0.02` | 0.06 | 1.80 |
-| Claim extraction if all on Sonnet 5.5 (upper bound) | `2000*1500/1e6*2 + 2000*350/1e6*10` | 13.00 | 390.00 |
-| **Base case total (Haiku bulk, Sonnet drafts, local embeddings)** | sum of first four rows | **1.97** | **58.95** |
-| Base case with Batch API on extraction and checks (half price on those two rows) | `0.65/2 + 0.66/2 + 0.62 + 0.04` | 1.31 | 39.30 |
-| Upper bound (all extraction on Sonnet, no batch) | `13.00 + 0.66 + 0.62 + 0.04` | 14.31 | 429.45 |
+| Claim extraction, 800 docs/day, Haiku 5.5 | `800*1500/1e6*0.10 + 800*350/1e6*0.50` | 0.26 | 7.80 |
+| Support checks, 2,400/day, Haiku 5.5 | `2400*600/1e6*0.10 + 2400*100/1e6*0.50` | 0.26 | 7.92 |
+| Assessment drafts, 10/day, Sonnet 5.5 | `10*8000/1e6*2 + 10*1500/1e6*10` | 0.31 | 9.30 |
+| Translation of titles and spans, 800/day, Haiku 5.5 | `800*300/1e6*0.10 + 800*150/1e6*0.50` | 0.08 | 2.52 |
+| **Base case total** | sum of the four rows | **0.92** | **27.54** |
+| Base case with the Batch API on extraction and checks | `0.26/2 + 0.26/2 + 0.31 + 0.08` | 0.66 | 19.68 |
+| Upper bound (extraction on Sonnet 5.5, no batch) | `5.20 + 0.26 + 0.31 + 0.08` | 5.86 | 175.74 |
 
-Storage growth at the same assumptions: text and metadata `3000*10 KB` = 29.3 MB/day, about 10.4 GB/year; embeddings `3000*1024*2 bytes` (halfvec) = 6.1 MB/day, about 2.24 GB/year; observations and derived tables are small by comparison.
-
-Other recurring costs: none for hosting (the existing utility VPS, section 8), the domain and Cloudflare (already paid), hosted embeddings only if the local path is abandoned. Free-tier sources need no payment. Total external spend at the base case is dominated by the LLM line and is well under a hundred dollars a month at these volumes; the volumes themselves are the lever (fewer documents extracted, more rule-based pre-filtering) if the user sets a lower cap.
+Storage at these volumes: text retained for 30 days at `1200*10 KB*30` = 352 MB
+rolling; permanent metadata and spans at `1200*2 KB` = 2.3 MB/day, about
+0.84 GB/year; no embeddings. Hosting: $0 (the existing utility VPS). The
+domain and Cloudflare are already paid. The LLM line is the whole external cost and is well under
+$50 a month at these volumes; volume is the lever if the user sets a lower cap.
 
 ## 13. What is deliberately not built
 
 A repo-map, context-packing or retrieval layer for the development sessions (suite rule); a
-custom forecasting model (document 04, section 11); a graph database; a search cluster; a
-message broker; user accounts; a mobile app; real-time websockets (hourly regeneration is
-enough for the stated cadences); a scraping fleet (feeds, APIs and bulk files only, with
-per-publisher page fetches under their terms).
+custom forecasting model (document 04, section 11); a graph database; a search cluster; a vector
+index; PostGIS; local embedding or translation models; a Node process on the server; a message
+broker; user accounts beyond the Access allow-list; a mobile app; real-time websockets (hourly
+regeneration is enough for the stated cadences); a scraping fleet (feeds, APIs and bulk files
+only, with per-publisher page fetches under their terms).

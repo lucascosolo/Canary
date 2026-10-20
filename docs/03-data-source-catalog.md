@@ -189,18 +189,20 @@ The user's afternoon decision (DECISIONS.md) narrows the catalog. Rules applied 
 2. A source is stored and displayed only if its licence is explicit and permits storage and
    display for personal non-commercial use (open, display with attribution, or CC BY-NC
    family). "Unverified" sources are links: title, URL and date only, no stored content.
-3. News articles are processed in memory: the retained record is the URL, title, publisher,
-   date, language, content digest, and for each extracted claim one quoted span of at most two
-   sentences. Full text is not retained unless the publisher's licence is open (CC family or
-   equivalent). Robots.txt and machine-readable reuse reservations are honoured; no paywall or
-   login is circumvented; no site is fetched more often than once an hour per feed.
+3. News article text is kept for a configurable window (default 30 days) for re-processing and
+   operator reading, then reduced to URL, title, publisher, date, language, content digest and the
+   quoted passages behind each claim (size discipline for the utility VPS, revised 13:11 CDT).
+   Open-licensed text is kept in full. Robots.txt and machine-readable reuse reservations are
+   honoured; no paywall or login is circumvented; no site is fetched more often than once an
+   hour per feed.
 4. Datasets with "no redistribution" or "display unchanged only" terms (CPI, Polity, PITF, COW,
    GTD, SIPRI beyond fair use) are not mirrored. CPI is shown unchanged with attribution or linked.
 5. Reuse of Common Crawl content is excluded (its terms place copyright risk and an AI-use
    indemnity on the user).
 6. Every page carries attribution for every source it draws on, a disclaimer that the site is a
    personal, non-commercial tool presenting opinions based on cited public sources, and a
-   contact address for corrections.
+   contact address for corrections. Because access is controlled (user, 13:11 CDT), content
+   rules beyond this are evidence standards (document 04, section 9), not legal minimisation.
 
 Catalog consequences: P0 after revision is V-Dem (with ERT), UCDP bulk, World Bank, Our World in
 Data, EWP SRA, Cline coups, GDELT (volume and URL discovery), Cloudflare Radar (conditional),

@@ -233,13 +233,12 @@ error (F-05) settles the workflow: automation proposes, people publish. Concrete
   that would distinguish them, before it is published;
 - disagreements among reputable sources are recorded as such in the evidence record and shown
   to readers; Canary does not resolve them by majority;
-- naming is conservative (user decision of 2026-10-20, afternoon): assessments name
-  institutions, offices and organisations; a person is named only in official capacity and only
-  for a documented official act (a decree, a ruling, a vote, a public statement with the quote
-  and its source); allegations about a person's conduct beyond documented official acts are not
-  published in Canary's words and are at most linked to the reporting source with its evidence
-  category shown; every assessment is phrased as an opinion based on the disclosed, cited facts
-  on the same screen.
+- naming follows the evidence (user decision of 2026-10-20, 13:11 CDT, for a private
+  access-controlled tool): a person, office or organisation is named wherever the cited evidence
+  supports it, with the evidence category shown beside the name (a `legal_finding` reads
+  differently from an `uncorroborated_allegation`, and the interface says which); Canary does not
+  speculate about motives or add characterisations the sources do not carry; every assessment
+  is phrased as a judgement based on the disclosed, cited facts on the same screen.
 
 ## 10. Worked examples (hypothetical)
 

@@ -114,3 +114,26 @@ keeps the rest:
 
 Consequences applied in `docs/01`, `03`, `04`, `07`, `09`, `10`, `11`, `12` as a dated revision.
 Hosting moves to the existing utility VPS (no new spend) with heavy steps on this PC.
+
+## 2026-10-20 — Lighter stack for the utility VPS; evidence-standard content rules (user input, 13:11 CDT)
+
+Recorded from the user: "make it a lighter process so it can run on the utility VPS comfortably
+if possible" and "since it's a private tool where I can control access, surely it doesn't need
+to be super conservative in the content".
+
+Decisions applied:
+
+- Stack lightened (docs/07): no pgvector, no PostGIS, no local embedding or translation models,
+  no Node process on the server. One Python service (FastAPI with Jinja2 templates and HTMX) and
+  one worker process on PostgreSQL 17 with pg_trgm and built-in text search. Duplicates by MinHash;
+  search by Postgres full text; translation of titles and spans by Claude Haiku; the world map a
+  static SVG from Natural Earth TopoJSON. Target footprint on the VPS: about 1 GB of RAM for
+  Canary's three processes combined, extraction volume about 800 documents a day. This PC is
+  optional (backtests, gold-set evaluation, bulk reprocessing), never on the critical path.
+- Content rules are evidence standards, not legal minimisation (docs/04 section 9): individuals
+  may be named where the cited evidence supports it, with the evidence category shown; claims
+  keep a quoted passage; opinions stay tied to cited facts; no speculation about motives. Article
+  text is retained for a configurable window (default 30 days) for re-processing and operator
+  reading, then reduced to metadata and spans, for size rather than legal reasons. The
+  disclaimer and corrections contact stay because they cost nothing.
+- Unchanged: no credentials or requests to any organisation; friends-only access; no public launch.

@@ -60,7 +60,7 @@ on Today is a number without a unit and a definition on hover.
 
 ### 3.2 Map
 
-A tile-free world map (Natural Earth TopoJSON in MapLibre or plain SVG) with country fills
+A tile-free world map (Natural Earth TopoJSON rendered as SVG with D3; no WebGL, no tiles) with country fills
 reserved for one chosen property at a time, selected explicitly by the reader: number of
 reviewed situations, trend, coverage label, a chosen baseline index with its year, or a chosen
 indicator's change signal. The legend states the property, the source and the date. Hovering
@@ -148,8 +148,9 @@ sentence linked to a claim identifier; unsupported sentences cannot be saved.
 WCAG 2.2 AA as the bar (1.4.1 use of colour, 2.4.7 focus visible, 2.4.11 focus not obscured;
 F-03). Keyboard: the Today list, tables and the map's table equivalent follow the APG grid
 pattern. Mobile: single column, Today first, map behind a tab, sparklines sized for touch.
-Performance budget: public pages server-rendered with a cached JSON payload; first screen of
-Today under 150 KB transferred excluding fonts; the map lazy-loaded. Readers are not tracked
+Performance budget: pages server-rendered from Jinja2 templates with HTMX partial updates
+(document 07); first screen of Today under 150 KB transferred excluding fonts; the map and the
+chart library loaded only on the pages that use them. Readers are not tracked
 beyond aggregate server logs.
 
 ## 7. Configurability

@@ -108,8 +108,9 @@ The first public release targets L3 with parts of L4. L5 is a research goal, not
 - No scraping that ignores robots.txt, paywalls, or machine-readable reuse reservations.
 - No requests for credentials, tokens, permissions or data access from any organisation; only
   sources usable without registration and with an explicit licence (document 03, section 8).
-- No retention of article full text after processing; metadata, one short quoted span per claim
-  and the extracted claim only. Open-licensed reports may be kept in full.
+- Article full text is retained only for a configurable processing window (default 30 days) to
+  keep the database small on the utility VPS; claims keep their quoted passage permanently.
+  Open-licensed reports may be kept in full.
 - No reader accounts beyond the Access allow-list; no personalisation; no tracking beyond
   aggregate, privacy-preserving analytics.
 - No coverage of individuals' private lives. Actors are public officials, institutions,
@@ -123,9 +124,11 @@ The first public release targets L3 with parts of L4. L5 is a research goal, not
 - Personal, non-commercial, published under the user's own name, no legal entity (user input,
   2026-10-20, afternoon). Source licences are evaluated for exactly that use; a public or
   commercial turn would require re-evaluation of the catalog (document 03).
-- Legal exposure minimised by construction (document 04, section 9; document 07, section 5):
-  open-licensed data only, short quotations only, conservative naming, honoured reuse
-  reservations, a disclaimer and a corrections contact.
+- Content standard (document 04, section 9): evidence-based rather than conservative, since
+  access is controlled; open-licensed data only; honoured reuse reservations; a disclaimer and a
+  corrections contact because they cost nothing.
+- Footprint: the service must run comfortably on the utility VPS (1 core, 3 GB shared with other
+  services); document 07 sets the budget.
 - One operator, developing with Claude Code, with compute on one workstation and light VPSes
   (machine context). The architecture must run on modest hardware and tolerate the operator
   being away for days.
