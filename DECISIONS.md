@@ -61,3 +61,11 @@ The user created the repository `lucascosolo/canary` on GitHub and asked for the
 pushed there. The remote is added as `origin` over SSH and `main` is pushed. This supersedes the
 "remote deferred" entry above. Pushes follow the suite rule: after every commit, as a bare
 `git push origin main` from the repository folder.
+
+## 2026-10-20 — LLM provider: the Anthropic API (user input)
+
+Recorded from the user on 2026-10-20: "Canary can use the anthropic API to do LLM calls if
+necessary." Consequences: the extraction, support-check, translation-fallback and drafting roles
+in `docs/07` are specified against the Anthropic Messages API with model and prompt versions
+recorded on every run; a monthly spending cap and the choice of default tier (Haiku 5.5 for bulk
+extraction, Sonnet 5.5 or Opus 5.5 for review drafts) remain for the user to confirm in `docs/11`.
