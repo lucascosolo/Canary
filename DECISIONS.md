@@ -54,3 +54,10 @@ system must tolerate public load and must treat every published assessment as a 
 (human review before strong warnings, visible evidence, corrections traceable). Not decided by
 this input: whether the user wants a reader-facing "beta" gate (Cloudflare Access) during early
 phases, and what monthly budget the non-profit operation can bear.
+
+## 2026-10-20 — Remote: github.com/lucascosolo/canary (user-created)
+
+The user created the repository `lucascosolo/canary` on GitHub and asked for the work to be
+pushed there. The remote is added as `origin` over SSH and `main` is pushed. This supersedes the
+"remote deferred" entry above. Pushes follow the suite rule: after every commit, as a bare
+`git push origin main` from the repository folder.
