@@ -1,0 +1,71 @@
+# 12. Implementation handoff
+
+For the next Claude Code session (the user intends to orchestrate implementation on Opus 5.5).
+Read this, then `AGENTS.md`, then `DECISIONS.md`, then the documents this file points to. Do not
+re-run the discovery: the research notes and the specification are the record.
+
+## What has been decided
+
+- Product: a free, public, non-profit, evidence-first monitor; no composite scores; no
+  autonomous publication; three layers shown side by side (documents 01 and 04).
+- Hosting target `canary.lucascosolo.com` on the user's Cloudflare zone; the host itself is a
+  pending spend decision (document 11, question 1). Phases 0 and 1 run on this PC only.
+- LLM provider: the Anthropic API (user, 2026-10-20). Default tiers: Haiku 5.5 for extraction
+  and support checks, Sonnet 5.5 for drafts; model and prompt versions recorded on every run.
+- Stack: Python 3.13, FastAPI, SQLAlchemy 2.1, Alembic, Procrastinate, PostgreSQL 18 with
+  pgvector and PostGIS, SvelteKit 3 with MapLibre 6, local bge-m3 embeddings and MADLAD-400
+  translation (document 07).
+- Data model and append-only rules in document 08; validation targets in document 09.
+- Source policy: the catalog in document 03 with `canary_use` per source; ACLED, GTD, COW,
+  Manifesto, commercial news APIs and bulk UN documents are out or links-only.
+- Repository: `main` on `github.com/lucascosolo/Canary`, pushed by URL because the sandbox
+  cannot write `.git/config` (document 11, question 10).
+
+## First implementation objective: Phase 0
+
+Deliver the ingestion spine on this PC (document 10, Phase 0). Suggested chunking for fresh
+implementer sessions, each with a contract and tests written first by `test-author`:
+
+1. Project scaffold: `pyproject.toml` (Python 3.13 pinned), `uv` lockfile, Docker Compose for
+   Postgres 18 with pgvector and PostGIS, Alembic baseline, the `canary` CLI skeleton, JUnit
+   test reporting, `.agent/` conventions. No application logic.
+2. Provenance spine and registry: `pipeline_run`, `source`, `source_version`, `source_health`,
+   `dataset_release`, the registry YAML loader with validation of `canary_use` and
+   `terms_verified_on`, the `canary health` command.
+3. Observations with vintages: `indicator`, `observation` (partitioned), `baseline` tables, the
+   as-of query helper, the vintage dedup rule, the reproducibility test harness.
+4. Dataset adapters, one chunk each: V-Dem Country-Year plus ERT (selected columns and
+   intervals); UCDP Candidate and GED/ACD bulk; World Bank Indicators API; Our World in Data;
+   EWP SRA CSV plus Cline coups; reference loads (GeoNames, Natural Earth, ISO, Wikidata alias
+   seed).
+5. `canary status` and the first `DECISIONS.md` entries from the phase.
+
+Acceptance for the phase is in document 10. Do not start Phase 1's feed list or extraction
+until Phase 0's acceptance evidence is committed.
+
+## Before the first chunk
+
+- Ask the user the Phase 0 and Phase 1 questions from document 11 (spend cap, scope emphasis,
+  the UCDP and ReliefWeb requests). Phase 0 itself needs no external request.
+- Confirm the Anthropic API key location (a mode-600 env file outside the repository) when
+  Phase 1 begins, not before.
+- Read `~/.agents/context/machine.md` and `engineering.md` before writing any install or build
+  command (suite rule); builds, Docker and tests run on this PC only.
+- Keep research notes untouched; add new dated notes for anything re-verified in a browser
+  (document 02, section 4 lists what needs it).
+
+## Constraints that do not change
+
+No `rm` in any form (quarantine instead); no force-push; no composite score; no model
+publishing anything; licence mode enforced at render; vintages on every observation; every
+derived row carries a run id; small commits pushed after each; `DECISIONS.md` for every choice;
+the three gates (spend, production deploy, external communication) need an explicit yes each time.
+
+## Where things are
+
+- `START.md`: the brief. `AGENTS.md`: repository rules. `DECISIONS.md`: decisions and
+  provisional assumptions.
+- `docs/01` to `docs/11`: the specification. `docs/research/notes/`: 38 dated research notes.
+  `docs/design_mockups/`: the user's two reference mockups.
+- `.agent/state.json` and `.agent/log.jsonl`: session state (gitignored); `.agent/handoff.md`
+  mirrors this document for the harness.

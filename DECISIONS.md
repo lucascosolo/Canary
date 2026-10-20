@@ -69,3 +69,21 @@ necessary." Consequences: the extraction, support-check, translation-fallback an
 in `docs/07` are specified against the Anthropic Messages API with model and prompt versions
 recorded on every run; a monthly spending cap and the choice of default tier (Haiku 5.5 for bulk
 extraction, Sonnet 5.5 or Opus 5.5 for review drafts) remain for the user to confirm in `docs/11`.
+
+## 2026-10-20 — Specification delivered; provisional assumptions it proceeds on
+
+The twelve documents under `docs/` are complete as a proposal. They proceed on these
+assumptions, each put to the user in `docs/11-risks-and-open-questions.md` section 2:
+
+- Hosting on a dedicated small VPS from Phase 2 (spend decision pending); Phases 0-1 on this PC.
+- An external spend cap of about $100 a month, with the base case computed at about $59.
+- A Cloudflare Access beta gate during Phase 2.
+- Credentials and permissions (UCDP token, ReliefWeb app name, Media Cloud key, ElectionGuide,
+  ACLED and HDX written questions) requested only after the user's yes.
+- Global scope with about twelve languages in the first feed list.
+- Symmetric editorial rules for every country, including the United States.
+- Code under Apache 2.0, Canary's own data and text under CC BY-SA 4.0.
+- The name "Canary".
+
+Superseded entries: "Repository initialised locally; remote deferred" is superseded by the
+remote entry above.
