@@ -14,9 +14,11 @@ re-run the discovery: the research notes and the specification are the record.
   Phases 0 and 1 run on this PC only.
 - LLM provider: the Anthropic API (user, 2026-10-20). Default tiers: Haiku 5.5 for extraction
   and support checks, Sonnet 5.5 for drafts; model and prompt versions recorded on every run.
-- Stack: Python 3.13, FastAPI, SQLAlchemy 2.1, Alembic, Procrastinate, PostgreSQL 18 with
-  pgvector and PostGIS, SvelteKit 3 with MapLibre 6, local bge-m3 embeddings and MADLAD-400
-  translation (document 07).
+- Stack (lightened 2026-10-20, 13:11 CDT, to run on the 1-core, 3 GB utility VPS): Python
+  3.13, FastAPI with Jinja2 and HTMX, SQLAlchemy 2.1, Alembic, Procrastinate, PostgreSQL 17 with
+  pg_trgm and built-in full text; MinHash for duplicates; static SVG map from Natural Earth; Haiku
+  for extraction, support checks and translation; no vector index, no PostGIS, no local models,
+  no Node on the server (document 07). Budget about 1 GB of RAM for Canary's processes.
 - Data model and append-only rules in document 08; validation targets in document 09.
 - Source policy: the catalog in document 03 with `canary_use` per source and the
   no-credentials, minimal-legal-risk rules of its section 8; only keyless, explicitly licensed
@@ -31,7 +33,7 @@ Deliver the ingestion spine on this PC (document 10, Phase 0). Suggested chunkin
 implementer sessions, each with a contract and tests written first by `test-author`:
 
 1. Project scaffold: `pyproject.toml` (Python 3.13 pinned), `uv` lockfile, Docker Compose for
-   Postgres 18 with pgvector and PostGIS, Alembic baseline, the `canary` CLI skeleton, JUnit
+   Postgres 17 (plain; matching the VPS), Alembic baseline, the `canary` CLI skeleton, JUnit
    test reporting, `.agent/` conventions. No application logic.
 2. Provenance spine and registry: `pipeline_run`, `source`, `source_version`, `source_health`,
    `dataset_release`, the registry YAML loader with validation of `canary_use` and
@@ -61,8 +63,9 @@ until Phase 0's acceptance evidence is committed.
 ## Constraints that do not change
 
 No `rm` in any form (quarantine instead); no force-push; no composite score; no model
-publishing anything; licence mode enforced at render; no retained article text; no credentials
-or requests to any organisation; conservative naming (document 04, section 9); vintages on every
+publishing anything; licence mode enforced at render; article text reduced to spans after the
+30-day window; no credentials or requests to any organisation; evidence-standard naming with
+the evidence category shown (document 04, section 9); the VPS resource budget; vintages on every
 observation; every derived row carries a run id; small commits pushed after each; `DECISIONS.md`
 for every choice; the three gates (spend, production deploy, external communication) need an
 explicit yes each time.

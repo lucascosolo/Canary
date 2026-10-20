@@ -13,7 +13,7 @@ Objective: a reproducible ingestion spine with provenance and vintages, proven o
 negotiation-free datasets, and the state files that let later sessions continue.
 
 Delivers: the Python project (3.13, FastAPI, SQLAlchemy 2.1, Alembic, Procrastinate), Postgres
-18 with pgvector and PostGIS in Docker on this PC, the schema for the provenance spine, sources,
+17 in Docker on this PC (plain, matching the utility VPS; no pgvector, no PostGIS), the schema for the provenance spine, sources,
 documents, dataset releases, observations with vintages, baselines (document 08 sections 1, 2,
 4); the source registry YAML with every catalog entry and its `canary_use`; adapters for V-Dem
 Country-Year and ERT, UCDP Candidate and GED/ACD (bulk; the API adapter waits for the token),
@@ -51,8 +51,9 @@ dateparser, geocoding via mordecai3 and GeoNames); lineage clustering (MinHash p
 parsing plus quote matching) with the 500-pair labelled set; the claim vocabulary file; the
 extraction gold set for English (300 documents) coded by the operator; Haiku 5.5 extraction with
 structured outputs and the support check; the evaluation report per document 09, section 3; the
-prompt-injection corpus and tests; translation of titles and spans with MADLAD-400 and Lingua;
-local embeddings with bge-m3 pinned by digest; cost measurement against document 07, section 12.
+prompt-injection corpus and tests; translation of titles and spans by Haiku in the extraction
+batch, with Lingua for language identification; the 30-day text-retention job; no embeddings;
+cost measurement against document 07, section 12.
 
 Prerequisites: Phase 0; the Anthropic API key in a mode-600 env file (user decision of
 2026-10-20 covers use; the key is the user's to place). No external requests.
@@ -80,8 +81,9 @@ Delivers: the indicator catalog v1 (about twenty indicators across the domains, 
 baseline and detection parameters), baselines at three horizons, change detection, the
 coverage index with its label rule, the watch-rule file with the first rules written but
 disabled; the stable-period false-alarm review (ten country-years) and its calibration-log
-entries; the SvelteKit application with Today, Map (tile-free), Country, Situation (read), Trends,
-Sources, Methodology and the corrections and calibration pages; the public API v1; the operator
+entries; the server-rendered application (FastAPI, Jinja2, HTMX; static SVG map) with Today,
+Map, Country, Situation (read), Trends, Sources, Methodology and the corrections and calibration
+pages; the read-only JSON API v1; the operator
 workspace (review queue, assessment editor with the eight fields and the checklist, source
 registry editor); deployment to the utility VPS behind Cloudflare Access with the heavy steps
 scheduled on this PC; backups to the storage VPS with a manifest entry and one restore drill.
@@ -141,7 +143,8 @@ change logged; the symmetry and ablation tests; language tiers two and three wit
 sets; the keyless legislative sources (EUR-Lex SPARQL, Brazil's Câmara API, the French Assembly's
 open data) and the `legislation` entity; ViEWS and EWP shown as external models with their
 precision; JSON-LD export of the episode library; saved searches and watchlists for the operator;
-the first yearly re-read of episodes.
+optional semantic search with embeddings computed on this PC if full-text search proves
+insufficient; the first yearly re-read of episodes.
 
 Prerequisites: Phase 3. No external requests.
 

@@ -42,9 +42,9 @@
    the project's premise (START.md section 6) and the strongest defence is the visible evidence.
 10. **Misleading historical analogies.** Mitigation: the comparison procedure, the required
     sentence, the outcome-blind matcher test, a third of the library as reversal or resilience.
-11. **Cost creep.** Mitigation: the measured cost model (document 07, section 12: about $59 a
-    month at the base assumptions, about $39 with the Batch API, an upper bound near $430 if
-    everything ran on Sonnet), a hard cap, volume as the lever.
+11. **Cost creep.** Mitigation: the measured cost model (document 07, section 12, lightened
+    volumes: about $28 a month at the base assumptions, about $20 with the Batch API, an upper
+    bound near $176 if extraction ran on Sonnet), a hard cap, volume as the lever.
 12. **Public-site abuse and outages.** Mitigation: read-only public surface, edge caching and rate
     limits, no reader accounts, backups with a quarterly restore drill.
 13. **Data loss on this PC.** Mitigation: pushed `main` after every commit, the suite's hourly
@@ -64,10 +64,9 @@ Each is stated with the recommendation and what it affects. Answers go into `DEC
    co-locate on the production VPS against the machine rules; or static-only on the utility VPS
    with no live pipeline. Recommendation: the dedicated VPS. This is a spending decision and is
    gated on an explicit yes.
-2. **Monthly external-spend cap (affects Phase 1).** Recommendation: a cap of $100 a month for
-   the Anthropic API plus any hosted service, with the base case at about $59 and the Batch API
-   bringing it to about $39 (document 07, section 12); extraction volume is throttled to stay
-   under it.
+2. **Monthly external-spend cap (affects Phase 1).** Recommendation: a cap of $50 a month for
+   the Anthropic API, with the lightened base case at about $28 and the Batch API bringing it to
+   about $20 (document 07, section 12); extraction volume is throttled to stay under it.
 3. **Beta gate (affects Phase 2).** Recommendation: Cloudflare Access on the whole site during
    Phase 2, removed at the Phase 3 launch gate.
 4. **Requests made in the user's name (affects Phases 0 to 3; external communications gate).**
@@ -120,13 +119,16 @@ permission, access or tokens from any entity; do nothing that risks legal troubl
 - Still open: 2 (spend cap: $100 a month recommended), 5 (scope emphasis), 6 (editorial policy,
   now with the conservative naming rule in document 04, section 9), 7 (licences for Canary's own
   code and text), 9 (name), 10 (the git remote command outside the sandbox).
-- Risk 1 (a wrong assessment harms someone) is reduced, not removed: a friends-only audience and
-  the content rules lower exposure, and publication to a small group is still publication. The
-  mitigations now in force are the ones a careful individual can apply without counsel:
-  open-licensed data only; short quotations; no retained article text; honoured reuse
-  reservations; institutions and offices named, individuals only in official capacity for
-  documented acts; opinions tied to cited facts on the same screen; a disclaimer and a corrections
-  contact; prompt correction when a source corrects itself. This is a design posture, not legal
-  advice; the user may still choose a short consultation at any point.
+- Risk 1 (a wrong assessment harms someone) is reduced by the friends-only, access-controlled
+  audience. At 13:11 CDT the user judged that this allows evidence-standard rather than
+  conservative content rules; what remains in force is what good analysis needs anyway:
+  open-licensed data only; quoted passages behind every claim; evidence categories shown beside
+  every name; judgements tied to cited facts on the same screen; honoured reuse reservations; a
+  disclaimer and a corrections contact; prompt correction when a source corrects itself. Article
+  text is retained for 30 days for processing and then reduced to spans, for size. This is a
+  design posture, not legal advice.
+- Lighter stack (user, 13:11 CDT): the critical path runs on the utility VPS within about 1 GB;
+  document 07 has the budget and the components dropped (vector index, PostGIS, local models,
+  Node).
 - Risk 3 (licence breach) is reduced by the no-credentials rule: every integrated source is
   explicitly licensed and usable without asking, and everything else is a link.
