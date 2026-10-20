@@ -1,0 +1,23 @@
+# Agent working state (see ~/.agents/context/state-files.md)
+.agent/state.json
+.agent/log.jsonl
+.agent/handoff.md
+
+# Sandbox-masked dotfiles that appear as device nodes inside the Claude Code sandbox
+.bash_profile
+.bashrc
+.gitconfig
+.gitmodules
+.idea
+.mcp.json
+.profile
+.ripgreprc
+.vscode
+.zprofile
+.zshrc
+
+# Harness state
+.claude/
+
+# Quarantine for files that would otherwise be deleted (never rm; see AGENTS.md)
+quarantine/
