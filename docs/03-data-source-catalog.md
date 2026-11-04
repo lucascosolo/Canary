@@ -149,6 +149,9 @@ HDX HAPI (app identifier), ACAPS (registration), IOM DTM, ReliefWeb.
 
 ## 7. The source registry
 
+Revised 2026-11-04: `registry/` is now the current record of each source's `canary_use`, and it
+differs from the tables above where notes H-03 and H-04 re-read the terms.
+
 Every source, integrated or not, is a record in the registry (a versioned YAML directory in the
 repository, loaded into the `source` table in document 08). Fields:
 

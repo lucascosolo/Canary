@@ -21,4 +21,5 @@ in on 2026-11-04 as working values. Treat them as unverified until a dated note 
 - `attribution_text`: a plain `Data: <organisation>` line except on `gdelt-doc` and `geonames`. UCDP
   also requires citing its listed publications, so its text is incomplete.
 
-Entries with `canary_use: unverified` may be shown only as links (`docs/03`, section 8).
+Entries with `canary_use: unverified` may be shown only as links (`docs/03`, section 8). On 2026-11-04
+these are `vdem-ert`, `keepiton`, `global-legal-monitor` and `iso-3166`; notes H-03 and H-04 record why.

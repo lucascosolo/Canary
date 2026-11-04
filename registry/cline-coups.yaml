@@ -13,7 +13,13 @@ revision_policy: silent
 access_method: CSV download from Illinois Data Bank
 endpoint: https://databank.illinois.edu/datasets/IDB-8026876
 auth: none
-canary_use: unverified
+licence_id: CC-BY (version not stated)
+terms_url: https://databank.illinois.edu/datasets/IDB-7095878
+terms_verified_on: 2026-11-04
+canary_use: open
+attribution_text: 'Peyton, Buddy, Joseph Bajjalieh, Michael Martin, and Andrea Gerald. 2026. Cline Center
+  Coup d''État Project Dataset. Cline Center for Advanced Social Research. V.2.2.2. February 17. University
+  of Illinois Urbana-Champaign. doi: 10.13012/B2IDB-9651987_V10'
 source_class: academic
 quality_notes: Coups, attempts and conspiracies, 1945 to early 2026 (1,161 events in v2.2.2). Licence
   is given as CC BY by listings only; Illinois Data Bank returned 403 in note D-03.

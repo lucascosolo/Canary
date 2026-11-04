@@ -5,11 +5,22 @@ Acceptance is in `docs/10`, Phase 0. Chunks follow `docs/12`, cut by what can be
 | Chunk | Deliverable | Verification | Needs a database | Status |
 |---|---|---|---|---|
 | scaffold | pyproject, lockfile, licences, Compose, Alembic baseline, CLI entry point, test reporting | `uv run pytest`; `uv run alembic upgrade head --sql` | no | complete |
-| registry | Registry YAML format, validating loader, `canary registry validate`, entries for the P0 sources | `uv run pytest`; `uv run canary registry validate` | no | see ledger |
+| registry | Registry YAML format, validating loader, `canary registry validate`, entries for the P0 sources | `uv run pytest`; `uv run canary registry validate` | no | complete |
 | spine | `pipeline_run`, `source`, `source_version`, `source_health`, `dataset_release`; `canary health` | `db` tests | yes | blocked |
 | observations | `indicator`, partitioned `observation`, `baseline`; as-of helper; vintage dedup; reproducibility test | `db` tests | yes | blocked |
-| adapters | V-Dem and ERT; UCDP bulk; World Bank; Our World in Data; EWP SRA and Cline coups; reference loads | each adapter ingests, a re-run adds no rows | yes for acceptance | blocked |
+| adapters | V-Dem Country-Year (ERT waits on its terms); UCDP bulk; World Bank; Our World in Data; EWP SRA and Cline coups; reference loads | each adapter ingests, a re-run adds no rows | yes for acceptance | blocked |
 | status | `canary status`; acceptance evidence committed | `docs/10` acceptance list | yes | blocked |
+
+## What the terms re-check changed (notes H-03 and H-04, 2026-11-04)
+
+- **V-Dem ERT stays links-only** until its terms are read, so its adapter waits. The episode list in
+  `docs/05` depends on it. V-Dem's own licence page or the ERT authors are where the answer is; the
+  no-requests rule rules out asking the authors.
+- **#KeepItOn and the Global Legal Monitor stay links-only**, which reaches Phase 1, not Phase 0.
+- **ISO 3166 needs no adapter of its own.** The reference load takes alpha-3 codes from Natural Earth,
+  which the registry records as open.
+- **The other Phase 0 adapters are clear**: V-Dem Country-Year, UCDP, World Bank, Our World in Data
+  (OWID-produced series only), the Early Warning Project (shown unchanged) and Cline Center coups.
 
 ## The blocking question
 

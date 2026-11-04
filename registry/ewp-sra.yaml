@@ -14,7 +14,13 @@ revision_policy: silent
 access_method: CSV download; data on GitHub
 endpoint: https://earlywarningproject.ushmm.org/api/sra/download/csv/2026-sra
 auth: none
-canary_use: unverified
+licence_id: USHMM Terms of Use
+terms_url: https://www.ushmm.org/copyright-and-legal-information/terms-of-use
+terms_verified_on: 2026-11-04
+canary_use: display
+attribution_text: 'Data: Early Warning Project, United States Holocaust Memorial Museum'
+redistribution_notes: Show unchanged, cite the museum in full, link to it and imply no endorsement. Never
+  use this data to train or fine-tune a model. The museum may revoke permission (note H-04).
 source_class: ngo_documentation
 quality_notes: Base rate about 1% of countries a year; two-year horizon; 1-2 onsets a year. Site links
   the USHMM general Terms of Use, which were not read.

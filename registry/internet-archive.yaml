@@ -14,7 +14,12 @@ access_method: 'REST: availability API, Memento, CDX server; Save Page Now'
 endpoint: https://archive.org/wayback/available
 auth: none
 rate_limit_text: Not stated on the documentation page.
-canary_use: unverified
+licence_id: Internet Archive Terms of Use
+terms_url: https://archive.org/about/terms
+terms_verified_on: 2026-11-04
+canary_use: links
+redistribution_notes: Store capture URLs only. Scholarship and research use. Check availability before
+  saving and keep saves low in volume (note H-04).
 source_class: platform
 quality_notes: Rate limits, terms and Save Page Now details not found in note H-01 (terms page rendered
   only a title).
