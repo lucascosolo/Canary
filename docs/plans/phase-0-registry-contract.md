@@ -62,3 +62,10 @@ Required unless marked optional. Optional fields default to `None`.
 
 `canary registry validate` prints `N sources valid` to stdout and returns 0. On `RegistryError` it
 prints each problem on its own line to stderr and returns 1.
+
+## Settled after test authoring (2026-11-04)
+
+- The success line is literally `N sources valid`, including `1 sources valid`.
+- A missing directory reaches the CLI as `RegistryError`, so it returns 1, for the default path too.
+- An `id` that fails the pattern is a problem; a file-name mismatch may be reported beside it.
+- Optional string fields may be empty unless the table says non-empty.
