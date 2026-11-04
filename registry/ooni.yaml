@@ -14,7 +14,12 @@ revision_policy: silent
 access_method: API and S3 buckets
 endpoint: https://api.ooni.io/
 auth: none
-canary_use: unverified
+licence_id: CC-BY-NC-SA-4.0
+terms_url: https://raw.githubusercontent.com/ooni/license/master/data/LICENSE.md
+terms_verified_on: 2026-11-04
+canary_use: display
+attribution_text: 'Data: Open Observatory of Network Interference (OONI)'
+redistribution_notes: Non-commercial, and derived data must stay under the same licence (note H-03).
 source_class: ngo_documentation
 quality_notes: Volunteer-probe dependence (not verified in the data policy). Data is stated as CC BY-NC-SA
   4.0 by the ooni/license repo and AWS Open Data, but note B-05 did not read LICENSE.md itself.

@@ -14,8 +14,13 @@ access_method: CSV per chart; Parquet catalog (ETL catalog API)
 endpoint: https://ourworldindata.org/grapher/{slug}.csv
 auth: none
 rate_limit_text: None documented; OWID says its APIs are under active development.
-canary_use: unverified
-redistribution_notes: A 403 on a chart CSV means the data is non-redistributable.
+licence_id: CC-BY-4.0
+terms_url: https://ourworldindata.org/faqs
+terms_verified_on: 2026-11-04
+canary_use: open
+attribution_text: 'Data: Our World in Data'
+redistribution_notes: CC BY 4.0 covers OWID-produced data only. Third-party series keep their providers'
+  terms, so check each upstream before storing it (note H-03).
 source_class: ngo_documentation
 quality_notes: APIs under development. OWID-produced data is stated as CC BY 4.0 and upstream data keeps
   the provider's licence, but note C-01 records that ourworldindata.org returned 403 to the page fetcher,

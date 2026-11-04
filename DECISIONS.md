@@ -218,3 +218,11 @@ Decision: database-dependent chunks wait for the user. Everything else in Phase 
 tests that need a database carry a `db` marker and are skipped, visibly, when
 `CANARY_TEST_DATABASE_URL` is unset. Options put to the user are in `docs/plans/phase-0.md`.
 Reopened by: the user's answer.
+
+## 2026-11-04 — OONI-derived data is carved out of Canary's CC BY-SA licence
+
+OONI's data is CC BY-NC-SA 4.0 (note H-03), which cannot be relicensed under the CC BY-SA 4.0
+provisionally chosen for Canary's own data and text. Decision: stored OONI measurements and values
+derived from them stay under OONI's licence and are labelled as such, and the rest of Canary keeps
+CC BY-SA. This is enough for a free friends-only tool. Alternative: drop OONI, which would remove an
+independent signal of network blocking. Reopened by: any bulk export or commercial use.
