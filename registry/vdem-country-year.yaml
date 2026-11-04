@@ -12,8 +12,9 @@ languages:
 - en
 declared_cadence: Annual, March
 revision_policy: silent
-access_method: Direct ZIP/CSV download, no registration; R package vdemdata
-endpoint: https://v-dem.net/data/the-v-dem-dataset/
+access_method: GitHub raw file from V-Dem's own R package; the website CSV sits behind a personal-data
+  form, which is not used (note H-05)
+endpoint: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
 auth: none
 licence_id: CC-BY-SA-4.0
 terms_url: https://v-dem.net/data/the-v-dem-dataset/
@@ -22,6 +23,7 @@ canary_use: open
 attribution_text: 'Data: V-Dem Institute, V-Dem Country-Year dataset v16 (doi:10.23696/vdemds26)'
 redistribution_notes: 'CC BY-SA 4.0: derivatives must be shared under the same licence.'
 source_class: academic
-quality_notes: Expert-coded; one-year lag; uncertainty intervals should be shown.
+quality_notes: Expert-coded; one-year lag; uncertainty intervals should be shown. Parsing needs about
+  2 GB of memory, so it runs on the PC and not on the utility VPS.
 status: evaluated
 evaluated_on: 2026-10-20

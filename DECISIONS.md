@@ -248,3 +248,27 @@ for it and retrofitting is harder). Reopened by: a measured query that scans man
 Open limitation, recorded the same day: `retrieved_at` starts when Canary starts, so an as-of date before
 the first retrieval returns nothing. Honest backtests on earlier dates need older dataset releases loaded
 with their stated release dates, which Phase 4 has to design (`docs/09`, section 5).
+
+## 2026-11-04 — V-Dem comes from its GitHub package; the website form is not used
+
+The website CSV now asks for an email address, gender and a privacy approval (note H-05). The standing
+rule is no registration, so that form is not submitted. V-Dem itself recommends its R package, whose
+public repository holds the same Full+Others dataset without a form, so Canary reads that file. The
+alternative was to ask the user to fill in the form once, which would hand personal data to an
+organisation for a file available without it. The cost: an R data file needs pandas and pyreadr, and
+parsing peaks near 2 GB, so V-Dem ingests on this PC and never on the utility VPS (`docs/07`, section 8).
+
+## 2026-11-04 — Our World in Data series need clearing one at a time
+
+The FAQ's CC BY covers data OWID produces, and most series come from third parties under their own terms
+(note H-03). Life expectancy, for one, cites UN WPP and the Human Mortality Database, and its metadata
+states no licence. So the adapter takes an allow-list that starts empty, and it stores nothing until a
+series is cleared with a dated note. Alternative: treat every OWID download as CC BY, which is exactly
+the assumption the no-legal-risk rule forbids. Reopened by: the Phase 2 indicator catalog asking for a
+specific series.
+
+## 2026-11-04 — Cline Center data arrives as a hand-downloaded file
+
+The data bank refuses scripted requests with HTTP 403, and Canary does not disguise its client. The data
+is CC BY and changes about once a year, so the adapter reads a file the user places in a drop folder.
+Alternative: drive a browser to fetch it, which would be getting around the refusal by another route.

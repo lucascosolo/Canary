@@ -11,8 +11,8 @@ languages:
 declared_cadence: Monthly
 expected_lag_days: 30
 revision_policy: silent
-access_method: Bulk CSV/Excel download; token-gated API not used
-endpoint: https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_8.csv
+access_method: Bulk CSV found on the downloads page; the file name changes monthly (note H-05)
+endpoint: https://ucdp.uu.se/downloads/
 auth: none
 rate_limit_text: 'Bulk download: none stated. API (not used): 5,000 requests a day, token required.'
 licence_id: CC-BY-4.0
@@ -21,6 +21,6 @@ terms_verified_on: 2026-10-20
 canary_use: open
 attribution_text: 'Data: Uppsala Conflict Data Program (UCDP), Candidate Events Dataset'
 source_class: academic
-quality_notes: 25-death threshold; media-dependent coding.
+quality_notes: 'Preliminary: many events carry ''Check'' code statuses. Media-dependent coding.'
 status: evaluated
 evaluated_on: 2026-10-20

@@ -14,11 +14,15 @@ dependencies = [
     "sqlalchemy>=2.1",
 ]
 
+[project.optional-dependencies]
+# V-Dem ships as an R data file. Parsing peaks near 2 GB, so this runs on the PC, never the VPS.
+heavy = ["pandas>=2.3", "pyreadr>=0.5"]
+
 [project.scripts]
 canary = "canary.cli:main"
 
 [dependency-groups]
-dev = ["pytest>=8.4", "ruff>=0.12"]
+dev = ["canary[heavy]", "pytest>=8.4", "ruff>=0.12"]
 
 [build-system]
 requires = ["hatchling"]
