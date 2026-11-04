@@ -4,7 +4,7 @@ Acceptance is in `docs/10`, Phase 0. Chunks follow `docs/12`, cut by what can be
 
 | Chunk | Deliverable | Verification | Needs a database | Status |
 |---|---|---|---|---|
-| scaffold | pyproject, lockfile, licences, Compose, Alembic baseline, CLI entry point, test reporting | `uv run pytest`; `uv run alembic upgrade head --sql` | no | see ledger |
+| scaffold | pyproject, lockfile, licences, Compose, Alembic baseline, CLI entry point, test reporting | `uv run pytest`; `uv run alembic upgrade head --sql` | no | complete |
 | registry | Registry YAML format, validating loader, `canary registry validate`, entries for the P0 sources | `uv run pytest`; `uv run canary registry validate` | no | see ledger |
 | spine | `pipeline_run`, `source`, `source_version`, `source_health`, `dataset_release`; `canary health` | `db` tests | yes | blocked |
 | observations | `indicator`, partitioned `observation`, `baseline`; as-of helper; vintage dedup; reproducibility test | `db` tests | yes | blocked |
