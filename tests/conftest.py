@@ -1,8 +1,8 @@
 """Shared test configuration.
 
 `db` tests get a real PostgreSQL. CANARY_TEST_DATABASE_URL wins when set. Otherwise a throwaway
-server starts in pytest's temporary directory and stops at the end of the session. They skip, visibly,
-only when neither is possible.
+server starts in pytest's temporary directory and stops at the end of the session. They skip,
+visibly, only when neither is possible.
 """
 
 from __future__ import annotations
