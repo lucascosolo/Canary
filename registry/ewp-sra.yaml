@@ -1,0 +1,22 @@
+id: ewp-sra
+name: Early Warning Project Statistical Risk Assessment 2025-26
+organisation: United States Holocaust Memorial Museum, Early Warning Project
+homepage: https://earlywarningproject.ushmm.org/statistical-risk-assessment
+type: model_output
+domains:
+- conflict
+- rights
+countries: global
+languages:
+- en
+declared_cadence: Annual, December
+revision_policy: silent
+access_method: CSV download; data on GitHub
+endpoint: https://earlywarningproject.ushmm.org/api/sra/download/csv/2026-sra
+auth: none
+canary_use: unverified
+source_class: ngo_documentation
+quality_notes: Base rate about 1% of countries a year; two-year horizon; 1-2 onsets a year. Site links
+  the USHMM general Terms of Use, which were not read.
+status: evaluated
+evaluated_on: 2026-10-20

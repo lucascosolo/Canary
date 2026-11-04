@@ -1,0 +1,22 @@
+id: keepiton
+name: 'Access Now #KeepItOn shutdown data'
+organisation: Access Now
+homepage: https://www.accessnow.org/keepiton-data
+type: event_dataset
+domains:
+- information
+- rights
+countries: global
+languages:
+- en
+declared_cadence: Annual with retroactive additions
+revision_policy: silent
+access_method: Spreadsheet download
+endpoint: https://www.accessnow.org/keepiton-data-spreadsheet
+auth: none
+canary_use: unverified
+source_class: ngo_advocacy
+quality_notes: Fields not confirmed; file format not stated; retroactive additions to earlier years. No
+  explicit dataset licence found; page footer links CC BY 4.0.
+status: evaluated
+evaluated_on: 2026-10-20

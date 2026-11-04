@@ -1,0 +1,21 @@
+id: cline-coups
+name: Cline Center Coup d'Etat Project dataset v2.2.2
+organisation: Cline Center for Advanced Social Research, University of Illinois
+homepage: https://clinecenter.illinois.edu/node/46
+type: event_dataset
+domains:
+- institutions
+countries: global
+languages:
+- en
+declared_cadence: Irregular, about annual
+revision_policy: silent
+access_method: CSV download from Illinois Data Bank
+endpoint: https://databank.illinois.edu/datasets/IDB-8026876
+auth: none
+canary_use: unverified
+source_class: academic
+quality_notes: Coups, attempts and conspiracies, 1945 to early 2026 (1,161 events in v2.2.2). Licence
+  is given as CC BY by listings only; Illinois Data Bank returned 403 in note D-03.
+status: evaluated
+evaluated_on: 2026-10-20

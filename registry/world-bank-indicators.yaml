@@ -1,0 +1,27 @@
+id: world-bank-indicators
+name: World Bank Indicators API
+organisation: World Bank
+homepage: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392-about-the-indicators-api-documentation
+type: api
+domains:
+- economy
+countries: global
+languages:
+- en
+declared_cadence: Quarterly (WDI)
+revision_policy: silent
+access_method: REST API v2, JSON, no key
+endpoint: https://api.worldbank.org/v2/
+auth: none
+rate_limit_text: No documented rate limit.
+licence_id: CC-BY-4.0
+terms_url: https://datacatalog.worldbank.org/public-licenses
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: World Bank, World Development Indicators'
+redistribution_notes: CC BY 4.0 is the default for World Bank-produced datasets; check each dataset's
+  catalog entry for exceptions (ODbL, externally specified, custom).
+source_class: intergovernmental
+quality_notes: No documented rate limit; licence varies by dataset.
+status: evaluated
+evaluated_on: 2026-10-20

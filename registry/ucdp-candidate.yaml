@@ -1,0 +1,26 @@
+id: ucdp-candidate
+name: UCDP Candidate Events Dataset
+organisation: Uppsala Conflict Data Program
+homepage: https://ucdp.uu.se/downloads/
+type: event_dataset
+domains:
+- conflict
+countries: global
+languages:
+- en
+declared_cadence: Monthly
+expected_lag_days: 30
+revision_policy: silent
+access_method: Bulk CSV/Excel download; token-gated API not used
+endpoint: https://ucdp.uu.se/downloads/candidateged/GEDEvent_v26_0_8.csv
+auth: none
+rate_limit_text: 'Bulk download: none stated. API (not used): 5,000 requests a day, token required.'
+licence_id: CC-BY-4.0
+terms_url: https://ucdp.uu.se/downloads/
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: Uppsala Conflict Data Program (UCDP), Candidate Events Dataset'
+source_class: academic
+quality_notes: 25-death threshold; media-dependent coding.
+status: evaluated
+evaluated_on: 2026-10-20

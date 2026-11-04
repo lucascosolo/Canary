@@ -1,0 +1,25 @@
+id: ucdp-prio-acd
+name: UCDP/PRIO Armed Conflict Dataset v26.1
+organisation: Uppsala Conflict Data Program and Peace Research Institute Oslo
+homepage: https://ucdp.uu.se/downloads/
+type: event_dataset
+domains:
+- conflict
+countries: global
+languages:
+- en
+declared_cadence: Annual (cadence not stated on the download page)
+revision_policy: silent
+access_method: Bulk ZIP/CSV download
+endpoint: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip
+auth: none
+licence_id: CC-BY-4.0
+terms_url: https://ucdp.uu.se/downloads/
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: Uppsala Conflict Data Program (UCDP) and PRIO, UCDP/PRIO Armed Conflict Dataset'
+source_class: academic
+quality_notes: Conflict-year data, 1946-2025, where at least one party is a state government. Threshold
+  and media dependence as UCDP.
+status: evaluated
+evaluated_on: 2026-10-20

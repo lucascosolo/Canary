@@ -1,0 +1,27 @@
+id: cloudflare-radar
+name: Cloudflare Radar outage annotations
+organisation: Cloudflare
+homepage: https://developers.cloudflare.com/radar/
+type: api
+domains:
+- information
+- rights
+countries: global
+languages:
+- en
+declared_cadence: Near real time
+revision_policy: silent
+access_method: REST API with a Bearer token from the user's own Cloudflare account (Account > Radar >
+  Read)
+endpoint: https://api.cloudflare.com/client/v4/radar/annotations/outages
+auth: token_by_request
+rate_limit_text: Not found.
+licence_id: CC-BY-NC-4.0
+terms_url: https://developers.cloudflare.com/radar/
+terms_verified_on: 2026-10-20
+canary_use: display
+attribution_text: 'Data: Cloudflare Radar (CC BY-NC 4.0)'
+source_class: platform
+quality_notes: Rate limits unstated. Outage annotations name scope, cause and type, including government-directed
+  shutdowns.
+status: lead

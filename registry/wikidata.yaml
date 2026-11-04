@@ -1,0 +1,25 @@
+id: wikidata
+name: Wikidata
+organisation: Wikimedia Foundation
+homepage: https://www.wikidata.org/
+type: reference
+domains:
+- reference
+countries: global
+languages:
+- en
+declared_cadence: Continuous
+revision_policy: silent
+access_method: Entity data and query service
+auth: none
+licence_id: CC0-1.0
+terms_url: https://www.wikidata.org/wiki/Wikidata:Licensing
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: Wikidata'
+redistribution_notes: Main, Property, Lexeme and EntitySchema namespaces are CC0; other namespaces are
+  CC BY-SA 4.0.
+source_class: platform
+quality_notes: Open community editing; historical coverage of event properties unchecked.
+status: evaluated
+evaluated_on: 2026-10-20

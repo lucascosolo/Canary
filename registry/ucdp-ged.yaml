@@ -1,0 +1,25 @@
+id: ucdp-ged
+name: UCDP Georeferenced Event Dataset (GED) v26.1
+organisation: Uppsala Conflict Data Program
+homepage: https://ucdp.uu.se/downloads/
+type: event_dataset
+domains:
+- conflict
+countries: global
+languages:
+- en
+declared_cadence: Annual (cadence not stated on the download page)
+revision_policy: silent
+access_method: Bulk ZIP/CSV download
+endpoint: https://ucdp.uu.se/downloads/ged/ged261-csv.zip
+auth: none
+licence_id: CC-BY-4.0
+terms_url: https://ucdp.uu.se/downloads/
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: Uppsala Conflict Data Program (UCDP), Georeferenced Event Dataset'
+source_class: academic
+quality_notes: 25-death threshold; media-dependent coding. Coverage 1989-2025, inferred from the citation
+  title.
+status: evaluated
+evaluated_on: 2026-10-20

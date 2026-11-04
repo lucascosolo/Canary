@@ -1,0 +1,25 @@
+id: geonames
+name: GeoNames daily dump
+organisation: GeoNames
+homepage: https://www.geonames.org/
+type: reference
+domains:
+- reference
+countries: global
+languages:
+- en
+declared_cadence: Daily
+revision_policy: silent
+access_method: Bulk download (allCountries.zip and per-country files)
+endpoint: https://download.geonames.org/export/dump/
+auth: none
+licence_id: CC-BY-3.0
+terms_url: https://www.geonames.org/export/
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: GeoNames, https://www.geonames.org/'
+redistribution_notes: Credit GeoNames with a link; commercial use allowed; data is as is.
+source_class: platform
+quality_notes: 'Data is as is. Free web services (not used): 10,000 credits a day, 1,000 an hour per username.'
+status: evaluated
+evaluated_on: 2026-10-20

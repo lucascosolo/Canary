@@ -1,0 +1,22 @@
+id: ooni
+name: OONI measurements
+organisation: Open Observatory of Network Interference
+homepage: https://ooni.org/
+type: api
+domains:
+- information
+- rights
+countries: global
+languages:
+- en
+declared_cadence: Continuous
+revision_policy: silent
+access_method: API and S3 buckets
+endpoint: https://api.ooni.io/
+auth: none
+canary_use: unverified
+source_class: ngo_documentation
+quality_notes: Volunteer-probe dependence (not verified in the data policy). Data is stated as CC BY-NC-SA
+  4.0 by the ooni/license repo and AWS Open Data, but note B-05 did not read LICENSE.md itself.
+status: evaluated
+evaluated_on: 2026-10-20

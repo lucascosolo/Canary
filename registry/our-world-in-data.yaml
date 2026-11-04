@@ -1,0 +1,24 @@
+id: our-world-in-data
+name: Our World in Data
+organisation: Our World in Data
+homepage: https://ourworldindata.org/
+type: api
+domains:
+- economy
+countries: global
+languages:
+- en
+declared_cadence: Varies by series
+revision_policy: silent
+access_method: CSV per chart; Parquet catalog (ETL catalog API)
+endpoint: https://ourworldindata.org/grapher/{slug}.csv
+auth: none
+rate_limit_text: None documented; OWID says its APIs are under active development.
+canary_use: unverified
+redistribution_notes: A 403 on a chart CSV means the data is non-redistributable.
+source_class: ngo_documentation
+quality_notes: APIs under development. OWID-produced data is stated as CC BY 4.0 and upstream data keeps
+  the provider's licence, but note C-01 records that ourworldindata.org returned 403 to the page fetcher,
+  so the FAQ was not read.
+status: evaluated
+evaluated_on: 2026-10-20

@@ -1,0 +1,24 @@
+id: natural-earth
+name: Natural Earth
+organisation: Natural Earth
+homepage: https://www.naturalearthdata.com/
+type: reference
+domains:
+- reference
+countries: global
+languages:
+- en
+declared_cadence: Irregular
+revision_policy: silent
+access_method: Bulk vector and raster download
+endpoint: https://www.naturalearthdata.com/downloads/
+auth: none
+licence_id: Public domain
+terms_url: https://www.naturalearthdata.com/about/terms-of-use/
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: Natural Earth'
+source_class: ngo_documentation
+quality_notes: Cadence not recorded in the notes.
+status: evaluated
+evaluated_on: 2026-10-20

@@ -1,0 +1,20 @@
+id: global-legal-monitor
+name: Global Legal Monitor
+organisation: Law Library of Congress
+homepage: https://www.loc.gov/law/foreign-news/
+type: rss
+domains:
+- legislation
+countries: global
+languages:
+- en
+declared_cadence: Continuous
+revision_policy: silent
+access_method: RSS (feed URLs to confirm)
+auth: none
+canary_use: unverified
+source_class: official_government
+quality_notes: Feed URLs, API and cadence not confirmed; loc.gov returned 403 in note E-01. Open licence
+  (US government work) is an inference, not read.
+status: evaluated
+evaluated_on: 2026-10-20

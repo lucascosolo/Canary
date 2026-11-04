@@ -1,0 +1,22 @@
+id: internet-archive
+name: Internet Archive Wayback availability and CDX APIs
+organisation: Internet Archive
+homepage: https://archive.org/help/wayback_api.php
+type: api
+domains:
+- information
+countries: global
+languages:
+- en
+declared_cadence: On demand
+revision_policy: silent
+access_method: 'REST: availability API, Memento, CDX server; Save Page Now'
+endpoint: https://archive.org/wayback/available
+auth: none
+rate_limit_text: Not stated on the documentation page.
+canary_use: unverified
+source_class: platform
+quality_notes: Rate limits, terms and Save Page Now details not found in note H-01 (terms page rendered
+  only a title).
+status: evaluated
+evaluated_on: 2026-10-20

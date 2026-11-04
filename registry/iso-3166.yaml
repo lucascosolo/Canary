@@ -1,0 +1,19 @@
+id: iso-3166
+name: ISO 3166 country codes and M49 regions
+organisation: International Organization for Standardization; United Nations Statistics Division
+homepage: https://www.iso.org/iso-3166-country-codes.html
+type: reference
+domains:
+- reference
+countries: global
+languages:
+- en
+declared_cadence: Irregular
+revision_policy: silent
+access_method: Not recorded in the notes
+auth: none
+canary_use: unverified
+source_class: intergovernmental
+quality_notes: No research note covers this source; the catalog gives licence open with no note.
+status: evaluated
+evaluated_on: 2026-10-20

@@ -1,0 +1,29 @@
+id: gdelt-doc
+name: GDELT DOC 2.0 API
+organisation: The GDELT Project
+homepage: https://www.gdeltproject.org/
+type: api
+domains:
+- information
+countries: global
+languages:
+- en
+declared_cadence: 15 minutes
+revision_policy: silent
+access_method: DOC 2.0 full-text search API; timeline modes and article list
+endpoint: https://api.gdeltproject.org/api/v2/doc/doc
+auth: none
+rate_limit_text: 'Article list: default 75, maximum 250 records. No request limit found.'
+licence_id: GDELT terms of use (free for any use with citation)
+terms_url: https://www.gdeltproject.org/about.html
+terms_verified_on: 2026-10-20
+canary_use: open
+attribution_text: 'Data: The GDELT Project, https://www.gdeltproject.org/'
+redistribution_notes: Any use or redistribution must include a citation to the GDELT Project and a link
+  to its website.
+source_class: platform
+quality_notes: 'Not an event record: about 1 in 5 GDELT-reported protest events were real in the 2016
+  Science test; duplication; English pivot via machine translation (65 languages). Use for volume and
+  URL discovery only. DOC index covers the last 3 months.'
+status: evaluated
+evaluated_on: 2026-10-20
