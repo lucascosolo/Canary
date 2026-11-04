@@ -67,3 +67,12 @@ the spine's rule for an unset `CANARY_DATABASE_URL`.
 ## Out of scope
 
 Adapters, computing baselines, signals, the coverage index, indicator catalog files.
+
+## Settled after test authoring (2026-11-04)
+
+- An invalid `deterioration_direction` raises `ValueError` when `IndicatorSpec` is constructed.
+- In `observation_digest`, a null `value_low` or `value_high` renders as the text `null`.
+- An unknown `indicator_id` surfaces as the database's foreign-key error; `write_observations` does not
+  check it first.
+- Partition names are `observation_YYYY_MM`, and a partition refuses UPDATE and DELETE when addressed
+  directly.
