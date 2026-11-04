@@ -26,6 +26,7 @@ COUNTED_TABLES = (
     "indicator_version",
     "observation",
     "pipeline_run",
+    "place",
     "source",
     "source_health",
     "source_version",

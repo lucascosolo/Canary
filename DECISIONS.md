@@ -272,3 +272,12 @@ specific series.
 The data bank refuses scripted requests with HTTP 403, and Canary does not disguise its client. The data
 is CC BY and changes about once a year, so the adapter reads a file the user places in a drop folder.
 Alternative: drive a browser to fetch it, which would be getting around the refusal by another route.
+
+## 2026-11-04 — A known release is parsed again on every ingest
+
+A release's digest covers only the downloaded files. Skipping parsing when the digest is known would strand rows: a country alias
+added later, or an indicator added to an adapter, would not load until the source published a new file, and a release row cannot be
+removed to force it. So the runner always re-parses, and vintage dedup writes only what is new. The new rows carry the release's
+`retrieved_at`: the data was public then, though Canary had not mapped it. Alternatives: put the alias file and adapter config in
+the content digest, which creates a false release for an unchanged file, or compare configs between runs, which adds state for
+the same result. Cost: parsing repeats on each poll, which matters only for V-Dem, whose schedule is weekly on the PC.

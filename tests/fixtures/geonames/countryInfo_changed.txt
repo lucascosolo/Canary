@@ -1,0 +1,5 @@
+# GeoNames.org Country Information
+# Invented rows for tests.
+#
+#ISO	ISO3	ISO-Numeric	fips	CountryName	Capital	Area(in sq km)	Population	Continent	tld	CurrencyCode	CurrencyName	Phone	Postal Code Format	Postal Code Regex	Languages	geonameid	neighbours	EquivalentFips
+GH	GHA	288	GH	Ghana	Accra	1	1	AF	.gh	XXX	Unit	1			en	2300660		

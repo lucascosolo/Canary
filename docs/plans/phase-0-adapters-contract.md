@@ -42,7 +42,9 @@ never yields a partial result for a changed file.
 5. Record health with `ok=True` and `items_seen` set to the parsed row count.
 6. Finish the run with input and output counts.
 
-A release already recorded for that digest writes no observations, and still records ok health and finishes its run.
+A release already recorded for that digest is parsed again and adds no release row. Vintage dedup means it writes only rows that
+are new, such as a country newly mapped by an alias or a newly added indicator (revised 2026-11-04). It records ok health and
+finishes its run. `new_release` is false.
 On `AccessRefused`, `FetchFailed`, `ManualFileMissing` or `SchemaChanged`: the nested transaction rolls back, health is
 recorded with `ok=False` and the message, the run finishes with `error_count=1`, and the exception is re-raised. The
 caller commits, so the failure record survives. `IngestResult` has `source_id`, `version_label`, `new_release`,

@@ -89,10 +89,8 @@ class LocalServer:
         if self.is_running():
             self._ctl("-m", "fast", "stop")
 
-    def create_database(self, name: str) -> str:
-        if not name.replace("_", "").isalnum():
-            raise ValueError(f"unsafe database name: {name!r}")
-        self._run(
+    def _psql(self, sql: str) -> str:
+        command = [
             str(pg_bin() / "psql"),
             "-h",
             "127.0.0.1",
@@ -104,9 +102,20 @@ class LocalServer:
             "postgres",
             "-v",
             "ON_ERROR_STOP=1",
-            "-c",
-            f'CREATE DATABASE "{name}"',
-        )
+            "-tAc",
+            sql,
+        ]
+        return subprocess.run(command, check=True, capture_output=True, text=True).stdout
+
+    def database_exists(self, name: str) -> bool:
+        if not name.replace("_", "").isalnum():
+            raise ValueError(f"unsafe database name: {name!r}")
+        return self._psql(f"SELECT 1 FROM pg_database WHERE datname = '{name}'").strip() == "1"
+
+    def create_database(self, name: str) -> str:
+        if not name.replace("_", "").isalnum():
+            raise ValueError(f"unsafe database name: {name!r}")
+        self._psql(f'CREATE DATABASE "{name}"')
         return self.url(name)
 
 

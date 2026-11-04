@@ -158,6 +158,18 @@ observation = Table(
     postgresql_partition_by="RANGE (retrieved_at)",
 )
 
+place = Table(
+    "place",
+    metadata,
+    Column("id", Text, primary_key=True),
+    Column("iso2", Text, nullable=False),
+    Column("name", Text, nullable=False),
+    Column("continent", Text, nullable=False),
+    Column("geonames_id", Integer, nullable=False),
+    Column("wikidata_id", Text),
+    Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
+)
+
 baseline = Table(
     "baseline",
     metadata,
