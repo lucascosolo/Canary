@@ -570,3 +570,11 @@ def test_zip_member_declaring_over_2_gb_is_refused_before_reading(
     monkeypatch.setattr(zipfile.ZipFile, "open", must_not_read)
     with pytest.raises(error_class("SchemaChanged")):
         only_csv_in_zip(declared)
+
+
+def test_wikidata_query_asks_for_a_stable_order() -> None:
+    """Live results came back in varying order, which made every poll look like a new release."""
+    fetcher = FakeFetcher(wikidata_routes())
+    a = adapter("wikidata")
+    url = next(iter(a.discover(fetcher).urls.values()))
+    assert "ORDER+BY" in url or "ORDER%20BY" in url

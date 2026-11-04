@@ -26,7 +26,7 @@ from canary.rawstore import RawRef
 
 GEONAMES_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
 GEONAMES_COLUMNS = ("ISO", "ISO3", "Country", "Continent", "geonameid")
-WIKIDATA_QUERY = "SELECT ?item ?code WHERE { ?item wdt:P298 ?code . }"
+WIKIDATA_QUERY = "SELECT ?item ?code WHERE { ?item wdt:P298 ?code . } ORDER BY ?code ?item"
 WIKIDATA_URL = "https://query.wikidata.org/sparql?" + urllib.parse.urlencode(
     {"query": WIKIDATA_QUERY}
 )

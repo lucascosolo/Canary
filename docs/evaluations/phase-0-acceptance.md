@@ -1,12 +1,12 @@
 # Phase 0 acceptance evidence, 2026-11-04
 
-Live ingest on this PC against a private PostgreSQL 17.11. Criteria are from `docs/10`, Phase 0.
+Live ingest on this PC against a private PostgreSQL 17.11, on a database rebuilt from empty after the review fixes in `docs/plans/phase-0-review-fixes.md`. Criteria are from `docs/10`, Phase 0.
 
 | Criterion | Result |
 |---|---|
 | Every adapter ingests its current release | Met for 10 sources. `cline-coups` waits for a hand-downloaded file. `our-world-in-data` has no cleared series, by decision. |
-| A re-run adds no observation rows | Met: every source reports `written=0` on the third pass below, and digests match across passes. |
-| `canary health` reports freshness | Met; output below predates the staleness allowances, so it shows `unknown` where one was unset. |
+| A re-run adds no observation rows | Met: every source reports `written=0` on the second pass below, and digests match across passes. Wikidata shows a false new release there, because its query had no order; that was then fixed, and three further live pulls gave one digest. |
+| `canary health` reports freshness | Met; output below. `our-world-in-data` shows `unknown` because it has no cleared series. |
 | Reproducibility test passes | Met on fixtures across two databases; the live digests also match across passes. |
 | `canary status` prints counts per table | Met; output below. |
 | Every observation traces to a release and a run | Met: zero rows without both. |
@@ -37,21 +37,21 @@ aliases, so it checks arithmetic and loading, not the choice of alias.
 ## Run output
 
 ```
-=== second pass, aliases added ===
-geonames 79f8f59ea01c existing written=0 unchanged=0 skipped=0 unmapped=0
-wikidata 926cf5522fe7 existing written=0 unchanged=0 skipped=0 unmapped=0
-natural-earth 5fed43337358 existing written=0 unchanged=0 skipped=0 unmapped=0
-vdem-ert 16.0 existing written=0 unchanged=39714 skipped=0 unmapped=0
+=== first pass on an empty database ===
+geonames 79f8f59ea01c new written=0 unchanged=0 skipped=0 unmapped=0
+wikidata 926cf5522fe7 new written=0 unchanged=0 skipped=0 unmapped=0
+natural-earth 5fed43337358 new written=0 unchanged=0 skipped=0 unmapped=0
+vdem-ert 16.0 new written=39714 unchanged=0 skipped=0 unmapped=0
 ewp-sra 2026-sra new written=336 unchanged=0 skipped=0 unmapped=0
-ucdp-prio-acd 261 existing written=612 unchanged=3552 skipped=17 unmapped=3
-ucdp-candidate 26_01_26_09 existing written=78 unchanged=820 skipped=0 unmapped=0
-ucdp-ged 261 existing written=3458 unchanged=27224 skipped=0 unmapped=0
-world-bank-indicators 2026-10-08 existing written=0 unchanged=41382 skipped=12936 unmapped=5
-vdem-country-year 16.0 existing written=0 unchanged=387947 skipped=0 unmapped=0
+ucdp-prio-acd 261 new written=4164 unchanged=0 skipped=17 unmapped=3
+ucdp-candidate 26_01_26_09 new written=898 unchanged=0 skipped=0 unmapped=0
+ucdp-ged 261 new written=30682 unchanged=0 skipped=0 unmapped=0
+world-bank-indicators 2026-10-08 new written=41382 unchanged=0 skipped=12936 unmapped=5
+vdem-country-year 16.0 new written=387947 unchanged=0 skipped=0 unmapped=0
 our-world-in-data none existing written=0 unchanged=0 skipped=0 unmapped=0
-=== third pass, expect written=0 ===
+=== second pass, expect written=0 ===
 geonames 79f8f59ea01c existing written=0 unchanged=0 skipped=0 unmapped=0
-wikidata 926cf5522fe7 existing written=0 unchanged=0 skipped=0 unmapped=0
+wikidata a7d9d9b784b2 new written=0 unchanged=0 skipped=0 unmapped=0
 natural-earth 5fed43337358 existing written=0 unchanged=0 skipped=0 unmapped=0
 vdem-ert 16.0 existing written=0 unchanged=39714 skipped=0 unmapped=0
 ewp-sra 2026-sra existing written=0 unchanged=336 skipped=0 unmapped=0
@@ -74,38 +74,37 @@ Partitions: ['observation_2026_11']
 Places with Wikidata ids: (251, 252)
 === status ===
 baseline 0
-dataset_release 10
+dataset_release 11
 indicator 29
 indicator_version 29
 observation 505123
-pipeline_run 36
+pipeline_run 23
 place 252
+place_version 503
 source 19
-source_health 34
+source_health 22
 source_version 19
 === health ===
 cline-coups never_fetched never
 cloudflare-radar never_fetched never
-ewp-sra unknown 2026-11-04T20:22:39.377874+00:00
+ewp-sra fresh 2026-11-04T20:40:14.572251+00:00
 gdelt-doc never_fetched never
-geonames unknown 2026-11-04T20:22:35.192337+00:00
+geonames fresh 2026-11-04T20:40:09.582323+00:00
 global-legal-monitor never_fetched never
 internet-archive never_fetched never
 iso-3166 never_fetched never
 keepiton never_fetched never
-natural-earth unknown 2026-11-04T20:22:36.516732+00:00
+natural-earth fresh 2026-11-04T20:40:11.176733+00:00
 ooni never_fetched never
-our-world-in-data unknown 2026-11-04T20:23:12.885602+00:00
-ucdp-candidate fresh 2026-11-04T20:22:46.008901+00:00
-ucdp-ged unknown 2026-11-04T20:22:56.906717+00:00
-ucdp-prio-acd unknown 2026-11-04T20:22:41.530139+00:00
-vdem-country-year unknown 2026-11-04T20:23:12.347680+00:00
-vdem-ert unknown 2026-11-04T20:22:38.330890+00:00
-wikidata unknown 2026-11-04T20:22:35.802976+00:00
-world-bank-indicators unknown 2026-11-04T20:23:01.073890+00:00
-unmapped: Bosnia-Herzegovina; Cambodia (Kampuchea); Congo; DR Congo (Zaire); Hyderabad; Madagascar (Malagasy); Myanmar (Burma); Netherlands; Russia (Soviet Union); Serbia (Yugoslavia); South Vietnam; South Yemen; United States of America; Vietnam (North Vietnam); Yemen (North Yemen); Zimbabwe (Rhodesia)
-unmapped: Bosnia-Herzegovina; Cambodia (Kampuchea); Congo; DR Congo (Zaire); Kingdom of eSwatini (Swaziland); Madagascar (Malagasy); Myanmar (Burma); Netherlands; Russia (Soviet Union); Serbia (Yugoslavia); United States of America; Yemen (North Yemen); Zimbabwe (Rhodesia)
-unmapped: DR Congo (Zaire); Myanmar (Burma); Russia (Soviet Union); United States of America; Yemen (North Yemen)
-unmapped: High income; Low income; Lower middle income; Not classified; Upper middle income
-unmapped: Hyderabad; South Vietnam; South Yemen
+our-world-in-data unknown 2026-11-04T20:40:48.271469+00:00
+ucdp-candidate fresh 2026-11-04T20:40:21.386775+00:00
+ucdp-ged fresh 2026-11-04T20:40:32.710763+00:00
+ucdp-prio-acd fresh 2026-11-04T20:40:16.857846+00:00
+vdem-country-year fresh 2026-11-04T20:40:47.741166+00:00
+vdem-ert fresh 2026-11-04T20:40:13.175724+00:00
+wikidata fresh 2026-11-04T20:40:10.360833+00:00
+world-bank-indicators fresh 2026-11-04T20:40:36.859719+00:00
+place versions (2, 503)
+file_refs sample [{'url': 'https://ucdp.uu.se/downloads/ged/ged261-csv.zip', 'sha256': '8c941d84954e555ee2e54f40fa04d9203bf1e2f962203d0a9930966c4947c667', 'filename': 'ged261-csv.zip', 'size_bytes': 39122522}]
+health messages [('world-bank-indicators', 'unmapped: 5'), ('ucdp-prio-acd', 'unmapped: 3')]
 ```
