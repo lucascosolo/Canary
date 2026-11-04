@@ -101,3 +101,19 @@ observations. A reproducibility test ingests the same fixtures into two database
 ## Out of scope
 
 Live downloads in the test suite, scheduling, GDELT, OONI, news feeds, the indicator catalog files, computing baselines.
+
+## Settled after test authoring (2026-11-04)
+
+- All five exceptions live in `src/canary/errors.py`. `FetchFailed` takes one message argument; `AccessRefused`
+  takes `(url, status)`.
+- `CountryResolver(names, aliases)` takes two dicts: name to alpha-3, and source name to alpha-3.
+- The V-Dem module exposes `rows_from_records(records, codebook) -> ParseResult`, where `codebook[column]` is
+  `{"name", "definition"}`.
+- `our-world-in-data` takes its allow-list as the constructor's one argument. Metadata is read as
+  `{"columns": {column: {titleShort, descriptionShort, unit, lastUpdated}}}`.
+- The live Early Warning column is `risk_in_2025_26`, so a two-digit second year means the same century. A
+  column with one year, like `risk_in_2025`, never matches.
+- The Wikidata query selects `?item ?code`, so its CSV columns are `item,code`.
+- `ReleaseRef.urls` keys are file basenames. World Bank paging adds `page=<n>` to the query.
+- `skipped` counts source rows, not country parts. The runner calls `load_resolver` for adapters that need it,
+  and geonames does not. Geonames stores `continent` as the raw code.
