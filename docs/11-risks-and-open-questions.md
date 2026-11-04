@@ -140,7 +140,7 @@ are English-only while sources stay multilingual. Effects on this document:
 
 - Resolved: question 5 (scope emphasis: global, with the feed list spanning regions and
   languages as coverage requires and the interface in English only) and question 10 (the remote
-  exists and `main` is pushed by URL).
+  exists and `main` is pushed with a bare `git push origin main`).
 - Proceeding on provisional defaults recorded in DECISIONS.md: question 2 (spend cap $50 a
   month, enforced in code; no LLM call before the user's yes at Phase 1), 6 (editorial policy as
   written), 7 (Apache 2.0 and CC BY-SA 4.0), 9 (the name Canary). The Cloudflare Radar token is
@@ -150,4 +150,4 @@ are English-only while sources stay multilingual. Effects on this document:
 - Risk 2's residual ("gold sets for many languages need operator time") is now also a method
   limit: non-English gold sets are coded from translations (docs/09, section 3).
 - Development-environment constraint found on 2026-11-04: the agent sandbox cannot reach the
-  Docker socket, so the test suite starts its own PostgreSQL from a PyPI package (DECISIONS.md).
+  Docker socket, and the test database is blocked on the user's choice of binary (DECISIONS.md).

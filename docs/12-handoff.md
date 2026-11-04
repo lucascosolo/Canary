@@ -25,8 +25,10 @@ re-run the discovery: the research notes and the specification are the record.
   no-credentials, minimal-legal-risk rules of its section 8; only keyless, explicitly licensed
   sources are stored; news bodies are processed in memory and not retained; ACLED, GTD, COW,
   Manifesto, ReliefWeb, commercial news APIs and bulk UN documents are out or links-only.
-- Repository: `main` on `github.com/lucascosolo/Canary`, pushed by URL because the sandbox
-  cannot write `.git/config` (document 11, question 10).
+- Repository: `main` on `github.com/lucascosolo/Canary`, pushed with a bare `git push origin main`
+  as its own command (verified 2026-11-04). The sandbox cannot write `.git/config`, so the branch
+  has no upstream entry until the user sets one outside it.
+- Phase 0 plan and chunk status: `docs/plans/phase-0.md`.
 
 ## First implementation objective: Phase 0
 

@@ -2,6 +2,14 @@
 .agent/state.json
 .agent/log.jsonl
 .agent/handoff.md
+.agent/ledger.md
+
+# Python and test output
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+reports/
 
 # Sandbox-masked dotfiles that appear as device nodes inside the Claude Code sandbox
 .bash_profile

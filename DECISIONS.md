@@ -190,6 +190,8 @@ Entries the specification proceeds on until the user changes them (`docs/11`, se
 
 ## 2026-11-04 — Development database on this PC: no Docker from inside the sandbox
 
+Superseded in part: the PyPI-packaged server named below did not work; see the entry "Test database is blocked on the user's choice" further down.
+
 Verified 2026-11-04: the Claude Code sandbox refuses the Docker socket ("permission denied while
 trying to connect to the docker API"), no system Postgres is installed, and the system Python is
 3.14 (the spec pins 3.13; uv installs 3.13 into `~/.cache/uv/python`). The Docker Compose file
@@ -200,3 +202,19 @@ file is kept for parity with the utility VPS and for the user's own runs outside
 Alternatives: asking the user to start a container outside the sandbox before every session
 (rejected: it breaks autonomy and the sandbox's localhost reachability is unverified); SQLite for
 tests (rejected: the schema depends on Postgres partitioning, pg_trgm and full text).
+
+## 2026-11-04 — Test database is blocked on the user's choice of PostgreSQL binary
+
+Measured on 2026-11-04 inside the agent sandbox. `pixeltable-pgserver` 0.7.2 (the researcher's
+pick) ships PostgreSQL without contrib, so it has no pg_trgm, and it opens a Unix socket at
+startup, which the sandbox refuses with "Operation not permitted". TCP on 127.0.0.1 works. The
+apt candidate on this PC (Ubuntu 26.04) is PostgreSQL 18, while the utility VPS runs 17. A
+checksum-verified PostgreSQL 17 tarball from the theseus-rs/postgresql-binaries GitHub releases
+(17.1.1, published 2026-10-24) was the next candidate; the permission classifier refused the
+download-and-execute step as external code, and the agent did not look for another route to the
+same result.
+
+Decision: database-dependent chunks wait for the user. Everything else in Phase 0 proceeds, and
+tests that need a database carry a `db` marker and are skipped, visibly, when
+`CANARY_TEST_DATABASE_URL` is unset. Options put to the user are in `docs/plans/phase-0.md`.
+Reopened by: the user's answer.
