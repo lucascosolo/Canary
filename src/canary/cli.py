@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime
 import hashlib
 import os
 import pathlib
@@ -14,6 +15,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from canary import __version__
+from canary.observations import table_counts
 from canary.provenance import entry_digest, finish_run, health_report, start_run, sync_registry
 from canary.registry import RegistryError, load_registry
 
@@ -29,6 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     sync = registry_commands.add_parser("sync", help="record the source registry in the database")
     sync.add_argument("--path", type=pathlib.Path, default=pathlib.Path("registry"))
     commands.add_parser("health", help="report source freshness")
+    commands.add_parser("status", help="row counts of every table")
     return parser
 
 
@@ -72,6 +75,19 @@ def _registry_sync(path: pathlib.Path) -> int:
     return 0
 
 
+def _status() -> int:
+    url = _database_url()
+    if url is None:
+        return 2
+    engine = create_engine(url)
+    with Session(engine) as session:
+        counts = table_counts(session)
+    engine.dispose()
+    for table in sorted(counts):
+        print(f"{table} {counts[table]}")
+    return 0
+
+
 def _health() -> int:
     url = _database_url()
     if url is None:
@@ -81,13 +97,15 @@ def _health() -> int:
         rows = health_report(session)
     engine.dispose()
     for row in rows:
-        last_ok = row.last_ok_at.isoformat() if row.last_ok_at else "never"
+        last_ok = row.last_ok_at.astimezone(datetime.UTC).isoformat() if row.last_ok_at else "never"
         print(f"{row.source_id} {row.freshness} {last_ok}")
     return 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "status":
+        return _status()
     if args.command == "health":
         return _health()
     if args.command == "registry" and args.registry_command == "sync":

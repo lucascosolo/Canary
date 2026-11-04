@@ -6,7 +6,10 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    Date,
+    Double,
     ForeignKey,
+    Index,
     Integer,
     MetaData,
     PrimaryKeyConstraint,
@@ -111,4 +114,60 @@ dataset_release = Table(
     Column("licence_snapshot", Text, nullable=False),
     Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
     UniqueConstraint("source_id", "content_digest", name="dataset_release_source_digest_key"),
+)
+
+indicator = Table(
+    "indicator",
+    metadata,
+    Column("id", Text, primary_key=True),
+    Column("current_version", Integer, nullable=False),
+    Column("source_id", Text, ForeignKey("source.id"), nullable=False),
+    Column("record", JSONB, nullable=False),
+)
+
+indicator_version = Table(
+    "indicator_version",
+    metadata,
+    Column("indicator_id", Text, ForeignKey("indicator.id"), nullable=False),
+    Column("version", Integer, nullable=False),
+    Column("record", JSONB, nullable=False),
+    Column("digest", Text, nullable=False),
+    Column("recorded_at", _TS, nullable=False),
+    PrimaryKeyConstraint("indicator_id", "version"),
+)
+
+observation = Table(
+    "observation",
+    metadata,
+    Column("id", UUID(as_uuid=True), nullable=False),
+    Column("indicator_id", Text, ForeignKey("indicator.id"), nullable=False),
+    Column("geo_ref", Text, nullable=False),
+    Column("period_start", Date, nullable=False),
+    Column("period_end", Date, nullable=False),
+    Column("value", Double, nullable=False),
+    Column("value_low", Double),
+    Column("value_high", Double),
+    Column(
+        "vintage_release_id", UUID(as_uuid=True), ForeignKey("dataset_release.id"), nullable=False
+    ),
+    Column("retrieved_at", _TS, nullable=False),
+    Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
+    PrimaryKeyConstraint("id", "retrieved_at"),
+    CheckConstraint("period_end >= period_start", name="observation_period_check"),
+    Index("observation_key_idx", "indicator_id", "geo_ref", "period_start", "retrieved_at"),
+    postgresql_partition_by="RANGE (retrieved_at)",
+)
+
+baseline = Table(
+    "baseline",
+    metadata,
+    Column("id", UUID(as_uuid=True), primary_key=True),
+    Column("indicator_id", Text, ForeignKey("indicator.id"), nullable=False),
+    Column("geo_ref", Text, nullable=False),
+    Column("horizon", Text, nullable=False),
+    Column("computed_at", _TS, nullable=False),
+    Column("stats", JSONB, nullable=False),
+    Column("method_version", Text, nullable=False),
+    Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
+    CheckConstraint("horizon in ('12m', '5y', 'full')", name="baseline_horizon_check"),
 )
