@@ -30,6 +30,12 @@ re-run the discovery: the research notes and the specification are the record.
   has no upstream entry until the user sets one outside it.
 - Phase 0 plan and chunk status: `docs/plans/phase-0.md`.
 
+## Next: Phase 1
+
+Start from `docs/10`, Phase 1, and the Phase 1 items under accepted gaps in `docs/plans/phase-0.md`. These parts spend nothing: the `document` schema, the curated
+feed list, the fetcher with robots.txt and reuse-reservation checks, normalisation and lineage clustering. These wait for the user: any Anthropic API call (money gate,
+plus a key), and the gold-set plan, since 300 hand-coded documents is the user's own time.
+
 ## Status, 2026-11-04
 
 Phase 0 is built and its evidence is in `docs/evaluations/phase-0-acceptance.md`. `canary db start` runs the private
