@@ -1,1 +1,15 @@
 source_name,iso3,note
+Bosnia-Herzegovina,BIH,UCDP spelling
+Cambodia (Kampuchea),KHM,UCDP name with a former name
+Congo,COG,UCDP uses this for the Republic of the Congo; DR Congo has its own name
+DR Congo (Zaire),COD,UCDP name with a former name
+Kingdom of eSwatini (Swaziland),SWZ,UCDP name with a former name
+Madagascar (Malagasy),MDG,UCDP name with a former name
+Myanmar (Burma),MMR,UCDP name with a former name
+Netherlands,NLD,GeoNames says The Netherlands
+Russia (Soviet Union),RUS,"UCDP's own successor convention: Soviet-era rows count under Russia"
+Serbia (Yugoslavia),SRB,"UCDP's own successor convention: Yugoslav-era rows count under Serbia"
+United States of America,USA,GeoNames says United States
+Vietnam (North Vietnam),VNM,"UCDP's own successor convention: North Vietnam rows count under Vietnam"
+Yemen (North Yemen),YEM,"UCDP's own successor convention: North Yemen rows count under Yemen"
+Zimbabwe (Rhodesia),ZWE,UCDP name with a former name

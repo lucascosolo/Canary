@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import pathlib
+import re
 import shutil
 import sys
 from collections.abc import Callable
@@ -13,6 +14,7 @@ from typing import Any
 import pytest
 
 from canary.adapters import ADAPTERS
+from canary.errors import AccessRefused, FetchFailed
 from canary.geo import CountryResolver
 from canary.rawstore import RawStore
 from fixtures.ingest_support import (
@@ -323,7 +325,7 @@ def test_ewp_period_comes_from_the_column_name_and_values_are_unchanged(
     store: RawStore, resolver: Any
 ) -> None:
     ref, result = go("ewp-sra", ewp_routes(), store, resolver)
-    assert ref.version_label == "1043-sra"
+    assert ref.version_label == f"{datetime.date.today().year}-sra"
     start, end = D(2025, 1, 1), D(2026, 12, 31)
     assert row_set(result) == {
         ("ewp-sra-risk", "GHA", start, end, 0.0123, None, None),
@@ -476,3 +478,31 @@ def test_changed_schema_raises_schema_changed_and_yields_no_partial_result(
     a, routes = changed_cases(tmp_path, monkeypatch)[source_id]()
     with pytest.raises(error_class("SchemaChanged")):
         run_pipeline(a, FakeFetcher(routes), store, resolver)
+
+
+def test_ewp_probes_from_next_year_down_and_takes_the_first_file_that_exists(
+    store: RawStore,
+) -> None:
+    fetcher = FakeFetcher(ewp_routes())
+    a = adapter("ewp-sra")
+    ref = a.discover(fetcher)
+    year = datetime.date.today().year
+    assert ref.version_label == f"{year}-sra"
+    assert [c.rsplit("/", 1)[-1] for c in fetcher.calls[:2]] == [f"{year + 1}-sra", f"{year}-sra"]
+    assert list(ref.urls) == [f"{year}-sra"]
+
+
+def test_ewp_with_no_file_in_the_probed_years_fails_as_a_fetch_failure() -> None:
+    fetcher = FakeFetcher(
+        [(re.compile(r"api/sra/download/csv/\d{4}-sra"), FetchFailed("HTTP 404"))]
+    )
+    with pytest.raises(FetchFailed):
+        adapter("ewp-sra").discover(fetcher)
+
+
+def test_ewp_access_refused_is_not_treated_as_a_missing_year() -> None:
+    refused = AccessRefused("https://example.org/x", 403)
+    fetcher = FakeFetcher([(re.compile(r"api/sra/download/csv/\d{4}-sra"), refused)])
+    with pytest.raises(AccessRefused):
+        adapter("ewp-sra").discover(fetcher)
+    assert len(fetcher.calls) == 1

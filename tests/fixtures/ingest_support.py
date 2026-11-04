@@ -14,6 +14,7 @@ from urllib.parse import urlencode
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from canary.errors import FetchFailed
 from canary.provenance import start_run, sync_registry
 from canary.registry import SourceEntry
 
@@ -183,10 +184,12 @@ def wb_routes(changed: bool = False) -> list[Route]:
 
 
 def ewp_routes(changed: bool = False) -> list[Route]:
+    """The current year's file exists; next year's answers 404, as the live site does."""
     name = "sra_changed.csv" if changed else "sra.csv"
+    year = datetime.date.today().year
     return [
-        ("api/sra/download/csv/1043-sra", fixture("ewp-sra", name)),
-        ("reports-and-downloads", fixture("ewp-sra", "reports-and-downloads.html")),
+        (f"api/sra/download/csv/{year}-sra", fixture("ewp-sra", name)),
+        (re.compile(r"api/sra/download/csv/\d{4}-sra"), FetchFailed("HTTP 404")),
     ]
 
 

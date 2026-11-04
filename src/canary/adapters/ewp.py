@@ -12,22 +12,20 @@ from canary.adapters.base import (
     Misses,
     ParseResult,
     ReleaseRef,
-    basename,
     column_digest,
     csv_header,
     csv_rows,
-    highest_link,
     is_blank,
     number,
     only_ref,
     read_bytes,
 )
-from canary.errors import SchemaChanged
+from canary.errors import FetchFailed, SchemaChanged
 from canary.observations import IndicatorSpec, ObservationRow
 from canary.rawstore import RawRef
 
-PAGE = "https://earlywarningproject.ushmm.org/reports-and-downloads"
-DOWNLOAD = re.compile(r"/api/sra/download/csv/(\d{4})-sra$")
+DOWNLOAD = "https://earlywarningproject.ushmm.org/api/sra/download/csv/{year}-sra"
+YEARS_TRIED = 4
 RISK_COLUMN = re.compile(r"risk_in_(\d{4})_(\d{2}|\d{4})")
 BIAS = (
     "A statistical model's estimate of rare events, built on data that are themselves incomplete, "
@@ -65,11 +63,19 @@ class EwpSra(Adapter):
     source_id = "ewp-sra"
 
     def config(self) -> Any:
-        return {"download": DOWNLOAD.pattern, "risk": RISK_COLUMN.pattern}
+        return {"download": DOWNLOAD, "years_tried": YEARS_TRIED, "risk": RISK_COLUMN.pattern}
 
     def discover(self, fetcher: Any) -> ReleaseRef:
-        url, match = highest_link(fetcher.get(PAGE), PAGE, DOWNLOAD)
-        return ReleaseRef(f"{match.group(1)}-sra", {basename(url): url})
+        this_year = datetime.date.today().year
+        for year in range(this_year + 1, this_year + 1 - YEARS_TRIED, -1):
+            label = f"{year}-sra"
+            url = DOWNLOAD.format(year=year)
+            try:
+                self._remember(fetcher, url)
+            except FetchFailed:
+                continue
+            return ReleaseRef(label, {label: url})
+        raise FetchFailed(f"no SRA file for the {YEARS_TRIED} years up to {this_year + 1}")
 
     def parse(self, refs: Sequence[RawRef], resolver: Any) -> ParseResult:
         data = read_bytes(only_ref(refs))
