@@ -10,7 +10,7 @@ versioned vocabulary files.
 
 ## 1. Provenance spine
 
-- **pipeline_run** (append-only): `id`, `stage` (ingest, normalise, extract, support_check,
+- **pipeline_run** (append-only, except one closing update that sets `ended_at`, the counts and `notes`): `id`, `stage` (ingest, normalise, extract, support_check,
   lineage, event_assembly, indicator, baseline, change_detection, watch_rules, coverage,
   embed, translate, draft), `started_at`, `ended_at`, `code_commit`, `config_digest`,
   `model_id`, `prompt_version`, `schema_version`, `indicator_catalog_version`,
@@ -40,7 +40,7 @@ versioned vocabulary files.
 - **document_translation** (append-only): `document_id`, `field` (title, span), `span_ref`,
   `target_language`, `text`, `engine` (madlad, claude), `engine_version`, `run_id`.
 - **dataset_release** (append-only): `source_id`, `version_label`, `released_at` (stated),
-  `retrieved_at`, `file_refs`, `row_count`, `schema_digest`, `licence_snapshot`, `run_id`.
+  `retrieved_at`, `file_refs`, `content_digest` (unique per source, added 2026-11-04), `row_count`, `schema_digest`, `licence_snapshot`, `run_id`.
 
 ## 3. Claims, lineages, events
 
@@ -75,7 +75,7 @@ versioned vocabulary files.
 - **indicator** (editorial, versioned): `id`, `name`, `definition`, `domain`, `source_id`,
   `unit`, `cadence`, `deterioration_direction` (up, down, none), `baseline_method`,
   `detection_method`, `detection_params`, `reporting_bias_note`, `licence_mode`, `version`.
-- **observation** (append-only, partitioned by month): `indicator_id`, `geo_ref`, `period_start`,
+- **observation** (append-only, partitioned by month of `retrieved_at`, 2026-11-04): `indicator_id`, `geo_ref`, `period_start`,
   `period_end`, `value`, `value_low`, `value_high` (intervals where the source gives them),
   `vintage_release_id`, `retrieved_at`, `run_id`. A revised value is a new row with a later
   vintage; queries "as of date D" take the latest vintage retrieved before D.

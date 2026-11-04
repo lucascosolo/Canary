@@ -234,3 +234,17 @@ Checked the same day: https://apt.postgresql.org/pub/repos/apt/dists/resolute-pg
 Ubuntu 26.04 and lists postgresql-17 at 17.10. The user installs it, because that needs sudo, and the
 system service is left disabled. Agent sessions start their own server from `/usr/lib/postgresql/17/bin`
 with a data directory under `~/.cache/canary/`, on TCP at 127.0.0.1 with Unix sockets turned off.
+
+## 2026-11-04 — Observations are partitioned by month of retrieval, not of the observed period
+
+`docs/07` and `docs/08` say "by month" without naming the column. V-Dem reaches back to 1789, so
+partitioning by observed period would create thousands of partitions for annual data, nearly all with
+few rows. Retrieval month gives a handful of partitions, and it matches the as-of query, which filters
+on `retrieved_at`. The cost: a primary key must include the partition column, so vintage dedup cannot be
+a unique constraint and lives in application code. Alternatives: period by decade (keeps uneven
+partitions and helps no planned query), or no partitioning (reasonable at this size, but the spec asks
+for it and retrofitting is harder). Reopened by: a measured query that scans many partitions.
+
+Open limitation, recorded the same day: `retrieved_at` starts when Canary starts, so an as-of date before
+the first retrieval returns nothing. Honest backtests on earlier dates need older dataset releases loaded
+with their stated release dates, which Phase 4 has to design (`docs/09`, section 5).
