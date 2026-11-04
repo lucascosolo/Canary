@@ -226,3 +226,11 @@ provisionally chosen for Canary's own data and text. Decision: stored OONI measu
 derived from them stay under OONI's licence and are labelled as such, and the rest of Canary keeps
 CC BY-SA. This is enough for a free friends-only tool. Alternative: drop OONI, which would remove an
 independent signal of network blocking. Reopened by: any bulk export or commercial use.
+
+## 2026-11-04 — Test database: PostgreSQL 17 from the PGDG apt repository (user input)
+
+Recorded from the user on 2026-11-04 (13:36 CST): "Do option 1", resolving the blocker entry above.
+Checked the same day: https://apt.postgresql.org/pub/repos/apt/dists/resolute-pgdg/Release exists for
+Ubuntu 26.04 and lists postgresql-17 at 17.10. The user installs it, because that needs sudo, and the
+system service is left disabled. Agent sessions start their own server from `/usr/lib/postgresql/17/bin`
+with a data directory under `~/.cache/canary/`, on TCP at 127.0.0.1 with Unix sockets turned off.

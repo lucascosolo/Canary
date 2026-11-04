@@ -22,7 +22,9 @@ Acceptance is in `docs/10`, Phase 0. Chunks follow `docs/12`, cut by what can be
 - **The other Phase 0 adapters are clear**: V-Dem Country-Year, UCDP, World Bank, Our World in Data
   (OWID-produced series only), the Early Warning Project (shown unchanged) and Cline Center coups.
 
-## The blocking question
+## The test-database question
+
+Resolved 2026-11-04: the user chose option 1. The rest of this section is kept for the record.
 
 The test database needs a real PostgreSQL that an agent can start inside its sandbox, which means
 TCP on loopback and pg_trgm available. Options:
