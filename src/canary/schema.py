@@ -133,6 +133,7 @@ indicator_version = Table(
     Column("record", JSONB, nullable=False),
     Column("digest", Text, nullable=False),
     Column("recorded_at", _TS, nullable=False),
+    Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
     PrimaryKeyConstraint("indicator_id", "version"),
 )
 
@@ -168,6 +169,19 @@ place = Table(
     Column("geonames_id", Integer, nullable=False),
     Column("wikidata_id", Text),
     Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
+    Column("current_version", Integer, nullable=False),
+)
+
+place_version = Table(
+    "place_version",
+    metadata,
+    Column("place_id", Text, ForeignKey("place.id"), nullable=False),
+    Column("version", Integer, nullable=False),
+    Column("record", JSONB, nullable=False),
+    Column("digest", Text, nullable=False),
+    Column("run_id", UUID(as_uuid=True), ForeignKey("pipeline_run.id"), nullable=False),
+    Column("recorded_at", _TS, nullable=False),
+    PrimaryKeyConstraint("place_id", "version"),
 )
 
 baseline = Table(

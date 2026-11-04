@@ -15,7 +15,31 @@ REFUSALS = (401, 403, 451)
 CHUNK_BYTES = 1 << 20
 
 
+def _opener() -> urllib.request.OpenerDirector:
+    """HTTP and HTTPS only: with no file or FTP handler, those schemes reach UnknownHandler."""
+    proxies = {
+        scheme: proxy
+        for scheme, proxy in urllib.request.getproxies().items()
+        if scheme in ("http", "https")
+    }
+    opener = urllib.request.OpenerDirector()
+    for handler in (
+        urllib.request.ProxyHandler(proxies),
+        urllib.request.UnknownHandler(),
+        urllib.request.HTTPHandler(),
+        urllib.request.HTTPSHandler(),
+        urllib.request.HTTPRedirectHandler(),
+        urllib.request.HTTPDefaultErrorHandler(),
+        urllib.request.HTTPErrorProcessor(),
+    ):
+        opener.add_handler(handler)
+    return opener
+
+
 class Fetcher:
+    def __init__(self) -> None:
+        self._opener = _opener()
+
     def get(
         self,
         url: str,
@@ -33,7 +57,7 @@ class Fetcher:
             request.add_header(name, value)
         request.add_header("User-Agent", USER_AGENT)
         try:
-            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            with self._opener.open(request, timeout=timeout_seconds) as response:
                 return _read(response, full, max_bytes)
         except urllib.error.HTTPError as exc:
             exc.close()
@@ -53,6 +77,6 @@ def _read(response, url: str, max_bytes: int) -> bytes:
             raise FetchFailed(f"larger than {max_bytes} bytes: {url}")
         chunks.append(chunk)
     declared = response.headers.get("Content-Length")
-    if declared is not None and int(declared) != total:
-        raise FetchFailed(f"truncated, {total} of {declared} bytes: {url}")
+    if declared is not None and (not declared.isdecimal() or int(declared) != total):
+        raise FetchFailed(f"got {total} bytes but Content-Length says {declared!r}: {url}")
     return b"".join(chunks)

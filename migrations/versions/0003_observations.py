@@ -33,6 +33,7 @@ def upgrade() -> None:
         sa.Column("record", postgresql.JSONB, nullable=False),
         sa.Column("digest", sa.Text, nullable=False),
         sa.Column("recorded_at", TS, nullable=False),
+        sa.Column("run_id", UUID, sa.ForeignKey("pipeline_run.id"), nullable=False),
         sa.PrimaryKeyConstraint("indicator_id", "version"),
     )
     op.create_table(

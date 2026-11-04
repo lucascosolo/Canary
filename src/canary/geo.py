@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import csv
+import hashlib
+import json
 import pathlib
 from collections.abc import Mapping
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -32,6 +35,17 @@ class CountryResolver:
 def load_aliases(path: pathlib.Path = ALIASES_PATH) -> dict[str, str]:
     with path.open(encoding="utf-8", newline="") as stream:
         return {row["source_name"]: row["iso3"] for row in csv.DictReader(stream)}
+
+
+def resolver_digest(session: Session) -> str:
+    """What names a run could resolve: the place names with their ids, and the aliases."""
+    names = sorted((row.name, row.id) for row in session.execute(select(place.c.id, place.c.name)))
+    try:
+        aliases: Any = sorted(load_aliases().items())
+    except (OSError, ValueError, KeyError, csv.Error) as exc:
+        aliases = f"unreadable alias file: {type(exc).__name__}"
+    text = json.dumps([names, aliases], separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def load_resolver(session: Session) -> CountryResolver:

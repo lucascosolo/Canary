@@ -19,6 +19,7 @@ from canary.cli import main
 from canary.observations import (
     IndicatorSpec,
     ObservationRow,
+    _ensure_partition,
     observation_digest,
     observations_as_of,
     sync_indicator,
@@ -44,6 +45,7 @@ TABLES = [
     "observation",
     "pipeline_run",
     "place",
+    "place_version",
     "source",
     "source_health",
     "source_version",
@@ -130,7 +132,7 @@ def setup_source(session: Session, source_id: str = "obs-src", *indicators: str)
     run_id = new_run(session)
     sync_registry(session, [make_entry(source_id)], run_id=run_id)
     for indicator_id in indicators or ("ind-a",):
-        sync_indicator(session, spec(indicator_id, source_id))
+        sync_indicator(session, spec(indicator_id, source_id), run_id=run_id)
     return run_id
 
 
@@ -209,8 +211,8 @@ def test_sync_indicator_new_is_version_one(db_session: Session) -> None:
 
 @pytest.mark.db
 def test_sync_indicator_changed_content_is_next_version(db_session: Session) -> None:
-    setup_source(db_session)
-    assert sync_indicator(db_session, spec(unit="count")) == 2
+    run_id = setup_source(db_session)
+    assert sync_indicator(db_session, spec(unit="count"), run_id=run_id) == 2
     current = scalar(db_session, "select current_version from indicator where id = 'ind-a'")
     assert current == 2
     versions = scalar(
@@ -221,25 +223,30 @@ def test_sync_indicator_changed_content_is_next_version(db_session: Session) -> 
 
 @pytest.mark.db
 def test_sync_indicator_same_content_writes_nothing(db_session: Session) -> None:
-    setup_source(db_session)
+    run_id = setup_source(db_session)
     before = (count(db_session, "indicator"), count(db_session, "indicator_version"))
-    assert sync_indicator(db_session, spec()) == 1
+    assert sync_indicator(db_session, spec(), run_id=run_id) == 1
     assert (count(db_session, "indicator"), count(db_session, "indicator_version")) == before
 
 
 @pytest.mark.db
 @pytest.mark.parametrize("direction", ["up", "down", "none"])
 def test_valid_deterioration_directions(db_session: Session, direction: str) -> None:
-    setup_source(db_session)
-    assert sync_indicator(db_session, spec("ind-d", deterioration_direction=direction)) == 1
+    run_id = setup_source(db_session)
+    assert (
+        sync_indicator(db_session, spec("ind-d", deterioration_direction=direction), run_id=run_id)
+        == 1
+    )
 
 
 @pytest.mark.db
 def test_invalid_deterioration_direction_raises_value_error(db_session: Session) -> None:
-    setup_source(db_session)
+    run_id = setup_source(db_session)
     before = count(db_session, "indicator")
     with pytest.raises(ValueError):
-        sync_indicator(db_session, spec("ind-bad", deterioration_direction="sideways"))
+        sync_indicator(
+            db_session, spec("ind-bad", deterioration_direction="sideways"), run_id=run_id
+        )
     assert count(db_session, "indicator") == before
 
 
@@ -631,3 +638,104 @@ def test_cli_status_without_database_url_returns_2(
     monkeypatch.delenv("CANARY_DATABASE_URL", raising=False)
     assert main(["status"]) == 2
     assert "CANARY_DATABASE_URL" in capsys.readouterr().err
+
+
+# --- review fixes: indicator_version.run_id ----------------------------------
+
+
+@pytest.mark.db
+def test_indicator_version_records_the_run_that_wrote_it(db_session: Session) -> None:
+    run_id = setup_source(db_session)
+    other = new_run(db_session)
+    sync_indicator(db_session, spec(unit="count"), run_id=other)
+    runs = db_session.execute(
+        text(
+            "select version, run_id from indicator_version where indicator_id = 'ind-a' order by 1"
+        )
+    ).all()
+    assert [tuple(r) for r in runs] == [(1, run_id), (2, other)]
+
+
+@pytest.mark.db
+def test_indicator_version_requires_a_run(db_session: Session) -> None:
+    setup_source(db_session)
+    refused(
+        db_session,
+        "insert into indicator_version "
+        "(indicator_id, version, record, digest, recorded_at, run_id) "
+        "values ('ind-a', 99, '{}', 'd', now(), null)",
+    )
+
+
+# --- review fixes: the `at` stamp, and ordering of vintages -------------------
+
+LATE = datetime.datetime(2026, 4, 10, 12, 0, tzinfo=UTC)
+
+
+@pytest.mark.db
+def test_write_observations_at_overrides_the_release_time_and_creates_its_partition(
+    db_session: Session,
+) -> None:
+    run_id = setup_source(db_session)
+    release_id = release(db_session, "obs-src", run_id, T1)
+    result = write_observations(db_session, release_id, run_id, [row()], at=LATE)
+    assert result.written == 1
+    stored = observations_as_of(db_session, "ind-a", LATE)
+    assert [(o.retrieved_at, o.vintage_release_id) for o in stored] == [(LATE, release_id)]
+    assert observations_as_of(db_session, "ind-a", T3) == []
+
+
+@pytest.mark.db
+def test_write_observations_without_at_still_uses_the_release_time(db_session: Session) -> None:
+    run_id = setup_source(db_session)
+    load(db_session, run_id, T1, [row()])
+    assert [o.retrieved_at for o in observations_as_of(db_session, "ind-a", T1)] == [T1]
+
+
+@pytest.mark.db
+def test_releases_a_b_a_write_the_differing_rows_under_a_with_the_new_time(
+    db_session: Session,
+) -> None:
+    run_id = setup_source(db_session)
+    release_a = release(db_session, "obs-src", run_id, T1)
+    release_b = release(db_session, "obs-src", run_id, T2)
+    assert write_observations(db_session, release_a, run_id, [row(value=1.0)]).written == 1
+    assert write_observations(db_session, release_b, run_id, [row(value=2.0)]).written == 1
+    third = write_observations(db_session, release_a, run_id, [row(value=1.0)], at=T3)
+    assert third.written == 1
+    assert write_observations(db_session, release_a, run_id, [row(value=1.0)], at=LATE).written == 0
+    assert values(db_session, T1) == [("USA", 1.0)]
+    assert values(db_session, T2) == [("USA", 2.0)]
+    assert values(db_session, T3) == [("USA", 1.0)]
+    assert values(db_session, LATE) == [("USA", 1.0)]
+    newest = observations_as_of(db_session, "ind-a", T3)[0]
+    assert (newest.vintage_release_id, newest.retrieved_at) == (release_a, T3)
+
+
+@pytest.mark.db
+def test_equal_retrieved_at_resolves_to_the_larger_id(db_session: Session) -> None:
+    run_id = setup_source(db_session)
+    release_id = release(db_session, "obs-src", run_id, T1)
+    _ensure_partition(db_session, T1)
+    small = uuid.UUID("00000000-0000-0000-0000-000000000001")
+    large = uuid.UUID("00000000-0000-0000-0000-000000000002")
+    for row_id, value in ((large, 2.0), (small, 1.0)):
+        db_session.execute(
+            text(
+                "insert into observation (id, indicator_id, geo_ref, period_start, period_end, "
+                "value, vintage_release_id, retrieved_at, run_id) values "
+                "(:id, 'ind-a', 'USA', :s, :e, :v, :rel, :t, :run)"
+            ),
+            {
+                "id": row_id,
+                "s": JAN,
+                "e": JAN_END,
+                "v": value,
+                "rel": release_id,
+                "t": T1,
+                "run": run_id,
+            },
+        )
+    assert values(db_session, T1) == [("USA", 2.0)]
+    again = write_observations(db_session, release_id, run_id, [row(value=2.0)], at=T2)
+    assert again.written == 0

@@ -2,27 +2,29 @@
 
 from __future__ import annotations
 
+import datetime
 import hashlib
+import json
 import pathlib
 import subprocess
 import uuid
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import select, update
-from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy import insert, select, update
 from sqlalchemy.orm import Session
 
 from canary.adapters.base import Adapter, ParseResult, PlaceRow
 from canary.errors import AccessRefused, FetchFailed, ManualFileMissing, NotPermitted, SchemaChanged
-from canary.geo import load_resolver
+from canary.geo import load_resolver, resolver_digest
 from canary.http import Fetcher
 from canary.observations import sync_indicator, write_observations
 from canary.provenance import finish_run, record_health, record_release, start_run
 from canary.rawstore import RawRef, RawStore
-from canary.schema import place, source
+from canary.schema import pipeline_run, place, place_version, source
 
+PLACE_FIELDS = ("iso2", "name", "continent", "geonames_id", "wikidata_id")
 PERMITTED_USES = ("open", "display")
 RECORDED_FAILURES = (AccessRefused, FetchFailed, ManualFileMissing, SchemaChanged)
 
@@ -54,38 +56,82 @@ def _licence_snapshot(record: dict[str, Any]) -> str:
     )
 
 
-def _file_refs(refs: Iterable[RawRef]) -> list[dict[str, Any]]:
+def _file_refs(refs: Iterable[RawRef], urls: Mapping[str, str]) -> list[dict[str, Any]]:
     return [
         {
             "filename": pathlib.Path(ref.path).name,
             "sha256": ref.sha256,
             "size_bytes": ref.size_bytes,
+            "url": urls[pathlib.Path(ref.path).name],
         }
         for ref in refs
     ]
 
 
-def _upsert_places(session: Session, rows: Iterable[PlaceRow], run_id: uuid.UUID) -> None:
+def _run_config_digest(session: Session, adapter: Adapter) -> str:
+    digest = adapter.config_digest()
+    if not adapter.needs_resolver:
+        return digest
+    return hashlib.sha256((digest + resolver_digest(session)).encode("utf-8")).hexdigest()
+
+
+def _current_place(session: Session, code: str) -> Any:
+    return session.execute(select(place).where(place.c.id == code)).one_or_none()
+
+
+def _place_record(row: Any) -> dict[str, Any]:
+    return {field: getattr(row, field) for field in PLACE_FIELDS}
+
+
+def _store_place(
+    session: Session, code: str, current: Any, record: dict[str, Any], run_id: uuid.UUID
+) -> int:
+    """Write a new version of a place, only if its record changed. Returns how many it wrote."""
+    if current is not None and _place_record(current) == record:
+        return 0
+    version = 1 if current is None else current.current_version + 1
+    fields = {**record, "current_version": version, "run_id": run_id}
+    if current is None:
+        session.execute(insert(place).values(id=code, **fields))
+    else:
+        session.execute(update(place).where(place.c.id == code).values(**fields))
+    text = json.dumps(record, sort_keys=True, separators=(",", ":"))
+    session.execute(
+        insert(place_version).values(
+            place_id=code,
+            version=version,
+            record=record,
+            digest=hashlib.sha256(text.encode("utf-8")).hexdigest(),
+            run_id=run_id,
+            recorded_at=datetime.datetime.now(datetime.UTC),
+        )
+    )
+    return 1
+
+
+def _save_places(session: Session, rows: Iterable[PlaceRow], run_id: uuid.UUID) -> int:
+    changed = 0
     for row in rows:
-        fields = {
+        current = _current_place(session, row.id)
+        record = {
             "iso2": row.iso2,
             "name": row.name,
             "continent": row.continent,
             "geonames_id": row.geonames_id,
-            "run_id": run_id,
+            "wikidata_id": None if current is None else current.wikidata_id,
         }
-        session.execute(
-            pg_insert(place)
-            .values(id=row.id, **fields)
-            .on_conflict_do_update(index_elements=["id"], set_=fields)
-        )
+        changed += _store_place(session, row.id, current, record, run_id)
+    return changed
 
 
-def _link_wikidata(session: Session, links: dict[str, str], run_id: uuid.UUID) -> None:
+def _link_wikidata(session: Session, links: dict[str, str], run_id: uuid.UUID) -> int:
+    changed = 0
     for code, item in sorted(links.items()):
-        session.execute(
-            update(place).where(place.c.id == code).values(wikidata_id=item, run_id=run_id)
-        )
+        current = _current_place(session, code)
+        if current is not None:
+            record = {**_place_record(current), "wikidata_id": item}
+            changed += _store_place(session, code, current, record, run_id)
+    return changed
 
 
 def _write(
@@ -97,7 +143,7 @@ def _write(
     digest: str,
     licence: str,
     run_id: uuid.UUID,
-) -> tuple[bool, int, int]:
+) -> tuple[bool, int, int, int]:
     release_id, new_release = record_release(
         session,
         adapter.source_id,
@@ -106,19 +152,24 @@ def _write(
         row_count=parsed.parsed_count,
         schema_digest=parsed.schema_digest,
         licence_snapshot=licence,
-        file_refs=_file_refs(refs),
+        file_refs=_file_refs(refs, ref.urls),
         run_id=run_id,
         released_at=ref.released_at,
     )
     for spec in parsed.indicators:
-        sync_indicator(session, spec)
+        sync_indicator(session, spec, run_id=run_id)
+    at = None
+    if not new_release:
+        at = session.execute(
+            select(pipeline_run.c.started_at).where(pipeline_run.c.id == run_id)
+        ).scalar_one()
     try:
-        outcome = write_observations(session, release_id, run_id, parsed.rows)
+        outcome = write_observations(session, release_id, run_id, parsed.rows, at=at)
     except ValueError as exc:
         raise SchemaChanged(f"{adapter.source_id}: {exc}") from exc
-    _upsert_places(session, parsed.places, run_id)
-    _link_wikidata(session, parsed.wikidata_ids, run_id)
-    return new_release, outcome.written, outcome.unchanged
+    changed = _save_places(session, parsed.places, run_id)
+    changed += _link_wikidata(session, parsed.wikidata_ids, run_id)
+    return new_release, outcome.written, outcome.unchanged, changed
 
 
 def _ingest_steps(
@@ -140,7 +191,7 @@ def _ingest_steps(
     digest = content_digest(refs)
     with session.begin_nested():
         parsed = adapter.parse(refs, resolver)
-        new_release, written, unchanged = _write(
+        new_release, written, unchanged, places_changed = _write(
             session, adapter, parsed, refs, ref, digest, licence, run_id
         )
     record_health(
@@ -149,12 +200,13 @@ def _ingest_steps(
         ok=True,
         items_seen=parsed.parsed_count,
         schema_digest=parsed.schema_digest,
+        message=f"unmapped: {len(parsed.unmapped)}" if parsed.unmapped else None,
     )
     finish_run(
         session,
         run_id,
         input_count=parsed.parsed_count + parsed.skipped,
-        output_count=written + len(parsed.places) + len(parsed.wikidata_ids),
+        output_count=written + places_changed,
         notes="unmapped: " + "; ".join(parsed.unmapped) if parsed.unmapped else None,
     )
     return IngestResult(
@@ -179,7 +231,10 @@ def ingest(session: Session, adapter: Adapter, fetcher: Fetcher, store: RawStore
         raise NotPermitted(f"{source_id} has canary_use {registered.canary_use}")
     licence = _licence_snapshot(registered.record)
     run_id = start_run(
-        session, "ingest", code_commit=code_commit(), config_digest=adapter.config_digest()
+        session,
+        "ingest",
+        code_commit=code_commit(),
+        config_digest=_run_config_digest(session, adapter),
     )
     try:
         return _ingest_steps(session, adapter, fetcher, store, licence, run_id)

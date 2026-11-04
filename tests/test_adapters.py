@@ -7,13 +7,16 @@ import hashlib
 import pathlib
 import re
 import shutil
+import struct
 import sys
+import zipfile
 from collections.abc import Callable
 from typing import Any
 
 import pytest
 
 from canary.adapters import ADAPTERS
+from canary.adapters.base import highest_link, only_csv_in_zip, page_link
 from canary.errors import AccessRefused, FetchFailed
 from canary.geo import CountryResolver
 from canary.rawstore import RawStore
@@ -506,3 +509,64 @@ def test_ewp_access_refused_is_not_treated_as_a_missing_year() -> None:
     with pytest.raises(AccessRefused):
         adapter("ewp-sra").discover(fetcher)
     assert len(fetcher.calls) == 1
+
+
+# --- review fixes: links stay on the page's host, zip members are bounded -----
+
+PATTERN = re.compile(r"/ged(\d+)-csv\.zip$")
+PAGE_URL = "https://example.org/downloads/"
+
+
+def page(*hrefs: str) -> bytes:
+    return "".join(f'<a href="{h}">x</a>' for h in hrefs).encode()
+
+
+def test_page_link_ignores_another_host_even_when_the_path_matches() -> None:
+    html = page(
+        "https://evil.example.net/ged999-csv.zip", "https://example.org/files/ged261-csv.zip"
+    )
+    url, match = page_link(html, PAGE_URL, PATTERN)
+    assert url == "https://example.org/files/ged261-csv.zip" and match.group(1) == "261"
+
+
+def test_page_link_ignores_file_links_even_when_the_path_matches(tmp_path: pathlib.Path) -> None:
+    html = page((tmp_path / "ged999-csv.zip").as_uri(), "/files/ged261-csv.zip")
+    url, _ = page_link(html, PAGE_URL, PATTERN)
+    assert url == "https://example.org/files/ged261-csv.zip"
+
+
+def test_page_link_accepts_http_and_relative_links_on_the_same_host() -> None:
+    assert page_link(page("http://example.org/a/ged5-csv.zip"), PAGE_URL, PATTERN) is not None
+    assert page_link(page("ged6-csv.zip"), PAGE_URL, PATTERN) is not None
+
+
+def test_page_link_with_only_foreign_links_finds_nothing_and_highest_link_raises(
+    tmp_path: pathlib.Path,
+) -> None:
+    html = page("https://example.org.evil.net/ged1-csv.zip", (tmp_path / "ged2-csv.zip").as_uri())
+    assert page_link(html, PAGE_URL, PATTERN) is None
+    with pytest.raises(error_class("SchemaChanged")):
+        highest_link(html, PAGE_URL, PATTERN)
+
+
+def zip_declaring(size: int, tmp_path: pathlib.Path) -> bytes:
+    path = tmp_path / "small.zip"
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr("data.csv", "a,b\n1,2\n")
+    data = bytearray(path.read_bytes())
+    central = data.index(b"PK\x01\x02")
+    data[central + 24 : central + 28] = struct.pack("<I", size)
+    return bytes(data)
+
+
+def test_zip_member_declaring_over_2_gb_is_refused_before_reading(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def must_not_read(*args: Any, **kwargs: Any) -> bytes:
+        raise AssertionError("the member was read")
+
+    declared = zip_declaring(2_500_000_000, tmp_path)
+    monkeypatch.setattr(zipfile.ZipFile, "read", must_not_read)
+    monkeypatch.setattr(zipfile.ZipFile, "open", must_not_read)
+    with pytest.raises(error_class("SchemaChanged")):
+        only_csv_in_zip(declared)

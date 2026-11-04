@@ -17,19 +17,22 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
+import canary.geo
 from canary.adapters import ADAPTERS
 from canary.cli import main
 from canary.geo import CountryResolver, load_resolver
 from canary.http import Fetcher
 from canary.ingest import ingest
-from canary.observations import observation_digest
+from canary.observations import observation_digest, observations_as_of
 from canary.provenance import record_health
 from canary.rawstore import RawStore
 from fixtures.ingest_support import (
     FakeFetcher,
+    add_place,
     candidate_routes,
     error_class,
     ert_routes,
+    ert_variant_routes,
     fixture,
     ged_routes,
     geonames_routes,
@@ -215,8 +218,8 @@ def test_a_known_release_is_parsed_again_so_a_newly_mapped_country_is_loaded(
     run_id = scalar(db_session, "select run_id from dataset_release limit 1")
     db_session.execute(
         text(
-            "insert into place (id, iso2, name, continent, geonames_id, run_id) "
-            "values ('ZZZ', 'ZZ', :name, 'AF', 1, :run)"
+            "insert into place (id, iso2, name, continent, geonames_id, run_id, current_version) "
+            "values ('ZZZ', 'ZZ', :name, 'AF', 1, :run, 1)"
         ),
         {"name": name, "run": run_id},
     )
@@ -527,3 +530,270 @@ def test_cli_health_prints_times_in_utc(cli_db: Engine, capsys: pytest.CaptureFi
     assert main(["health"]) == 0
     line = next(x for x in capsys.readouterr().out.splitlines() if x.startswith("vdem-ert "))
     assert line.split()[-1] == "2026-11-01T07:00:00+00:00"
+
+
+# --- review fixes: time ------------------------------------------------------
+
+
+def one(session: Session, sql: str, **params: Any) -> Any:
+    return scalar(session, sql, **params)
+
+
+def stamp(session: Session) -> datetime.datetime:
+    """The newest retrieved_at among observations: when Canary last came to hold a value."""
+    return one(session, "select max(retrieved_at) from observation")
+
+
+def last_run_start(session: Session) -> datetime.datetime:
+    return one(session, "select max(started_at) from pipeline_run where config_digest <> 'seed'")
+
+
+def sums(session: Session, indicator: str, as_of: datetime.datetime) -> dict[Any, float]:
+    return {
+        (o.geo_ref, o.period_start): o.value for o in observations_as_of(session, indicator, as_of)
+    }
+
+
+@pytest.mark.db
+def test_country_mapped_on_a_reparse_is_absent_before_and_present_after(
+    db_session: Session, store: RawStore
+) -> None:
+    seed_places(db_session)
+    register(db_session, "ucdp-candidate")
+    adapter = ADAPTERS["ucdp-candidate"]
+    ingest(db_session, adapter(), FakeFetcher(candidate_routes()), store)
+    t1 = stamp(db_session)
+    add_place(db_session, "ATL", "AT", "Atlantis")
+    again = ingest(db_session, adapter(), FakeFetcher(candidate_routes()), store)
+    t2 = last_run_start(db_session)
+    assert again.new_release is False and again.written == 2 and again.unmapped == 0
+    jan = datetime.date(2026, 1, 1)
+    assert ("ATL", jan) not in sums(db_session, "ucdp-candidate-events", t1)
+    assert sums(db_session, "ucdp-candidate-events", t2)[("ATL", jan)] == 1.0
+    assert sums(db_session, "ucdp-candidate-deaths", t2)[("ATL", jan)] == 9.0
+    assert t2 > t1
+
+
+@pytest.mark.db
+def test_alias_onto_an_existing_code_writes_a_new_vintage_for_the_changed_months(
+    db_session: Session, store: RawStore, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    seed_places(db_session)
+    register(db_session, "ucdp-candidate")
+    adapter = ADAPTERS["ucdp-candidate"]
+    ingest(db_session, adapter(), FakeFetcher(candidate_routes()), store)
+    t1 = stamp(db_session)
+    monkeypatch.setattr(canary.geo, "load_aliases", lambda *a, **k: {"Atlantis": "GHA"})
+    again = ingest(db_session, adapter(), FakeFetcher(candidate_routes()), store)
+    t2 = last_run_start(db_session)
+    jan, feb = datetime.date(2026, 1, 1), datetime.date(2026, 2, 1)
+    assert (again.new_release, again.written, again.unmapped) == (False, 2, 0)
+    assert sums(db_session, "ucdp-candidate-events", t1)[("GHA", jan)] == 2.0
+    assert sums(db_session, "ucdp-candidate-deaths", t1)[("GHA", jan)] == 8.0
+    assert sums(db_session, "ucdp-candidate-events", t2)[("GHA", jan)] == 3.0
+    assert sums(db_session, "ucdp-candidate-deaths", t2)[("GHA", jan)] == 17.0
+    assert sums(db_session, "ucdp-candidate-events", t2)[("GHA", feb)] == 1.0
+    assert (
+        one(
+            db_session,
+            "select count(*) from observation where geo_ref = 'GHA' "
+            "and period_start = '2026-02-01' and indicator_id = 'ucdp-candidate-events'",
+        )
+        == 1
+    )
+
+
+@pytest.mark.db
+def test_releases_a_b_a_through_the_runner(db_session: Session, store: RawStore) -> None:
+    seed_places(db_session)
+    register(db_session, "vdem-ert")
+
+    def run(version: str, value: str) -> Any:
+        routes = ert_variant_routes(version, value)
+        return ingest(db_session, ADAPTERS["vdem-ert"](), FakeFetcher(routes), store)
+
+    jan = datetime.date(2020, 1, 1)
+
+    def ghana(at: datetime.datetime) -> float:
+        return sums(db_session, "ert-aut-ep", at)[("GHA", jan)]
+
+    first = run("15.0.1", "0")
+    t1 = stamp(db_session)
+    second = run("15.0.2", "1")
+    t2 = stamp(db_session)
+    third = run("15.0.1", "0")
+    t3 = last_run_start(db_session)
+    fourth = run("15.0.1", "0")
+    assert (first.new_release, second.new_release, third.new_release) == (True, True, False)
+    assert (first.written, second.written, third.written, fourth.written) == (7, 1, 1, 0)
+    assert (ghana(t1), ghana(t2), ghana(t3)) == (0.0, 1.0, 0.0)
+    assert t1 < t2 < t3
+    newest = [o for o in observations_as_of(db_session, "ert-aut-ep", t3) if o.geo_ref == "GHA"][0]
+    release_a = one(db_session, "select id from dataset_release where version_label = '15.0.1'")
+    assert (newest.vintage_release_id, newest.retrieved_at) == (release_a, t3)
+    assert one(db_session, "select count(*) from observation") == 9
+
+
+# --- review fixes: tracing ---------------------------------------------------
+
+
+def geonames_bytes(name: str = "Ghana") -> bytes:
+    return fixture("geonames", "countryInfo.txt").replace(b"\tGhana\t", f"\t{name}\t".encode())
+
+
+def run_geonames(session: Session, store: RawStore, data: bytes) -> Any:
+    return ingest(session, ADAPTERS["geonames"](), FakeFetcher([("countryInfo.txt", data)]), store)
+
+
+def versions(session: Session) -> dict[str, list[int]]:
+    out: dict[str, list[int]] = {}
+    for pid, version in session.execute(
+        text("select place_id, version from place_version order by 1, 2")
+    ):
+        out.setdefault(pid, []).append(version)
+    return out
+
+
+@pytest.mark.db
+def test_geonames_ingest_writes_version_one_for_every_place(
+    db_session: Session, store: RawStore
+) -> None:
+    register(db_session, "geonames")
+    run_geonames(db_session, store, geonames_bytes())
+    assert versions(db_session) == {"GHA": [1], "MLI": [1], "NER": [1]}
+    assert one(db_session, "select count(*) from place where current_version = 1") == 3
+    run_id = one(db_session, "select run_id from place where id = 'GHA'")
+    assert run_id == one(db_session, "select run_id from place_version where place_id = 'GHA'")
+
+
+@pytest.mark.db
+def test_second_identical_geonames_ingest_writes_nothing(
+    db_session: Session, store: RawStore
+) -> None:
+    register(db_session, "geonames")
+    run_geonames(db_session, store, geonames_bytes())
+    first_run = one(db_session, "select run_id from place where id = 'GHA'")
+    run_geonames(db_session, store, geonames_bytes())
+    assert versions(db_session) == {"GHA": [1], "MLI": [1], "NER": [1]}
+    assert one(db_session, "select run_id from place where id = 'GHA'") == first_run
+
+
+@pytest.mark.db
+def test_a_changed_place_name_writes_version_two_for_that_place_only(
+    db_session: Session, store: RawStore
+) -> None:
+    register(db_session, "geonames")
+    run_geonames(db_session, store, geonames_bytes())
+    run_geonames(db_session, store, geonames_bytes("Republic of Ghana"))
+    assert versions(db_session) == {"GHA": [1, 2], "MLI": [1], "NER": [1]}
+    row = db_session.execute(
+        text("select name, current_version, run_id from place where id = 'GHA'")
+    ).one()
+    assert (row.name, row.current_version) == ("Republic of Ghana", 2)
+    newest = db_session.execute(
+        text("select record, run_id from place_version where place_id = 'GHA' and version = 2")
+    ).one()
+    assert newest.record["name"] == "Republic of Ghana"
+    assert newest.run_id == row.run_id
+
+
+@pytest.mark.db
+def test_wikidata_link_adds_wikidata_id_keeps_other_fields_and_writes_a_version(
+    db_session: Session, store: RawStore
+) -> None:
+    register(db_session, "geonames")
+    register(db_session, "wikidata")
+    run_geonames(db_session, store, geonames_bytes())
+    before = one(db_session, "select record from place_version where place_id = 'GHA'")
+    wd = FakeFetcher(wikidata_routes())
+    ingest(db_session, ADAPTERS["wikidata"](), wd, store)
+    assert versions(db_session) == {"GHA": [1, 2], "MLI": [1, 2], "NER": [1]}
+    after = one(
+        db_session, "select record from place_version where place_id = 'GHA' and version = 2"
+    )
+    assert after["wikidata_id"] == "Q117"
+    assert {k: v for k, v in after.items() if k != "wikidata_id"} == {
+        k: v for k, v in before.items() if k != "wikidata_id"
+    }
+    assert one(db_session, "select wikidata_id from place where id = 'GHA'") == "Q117"
+    assert one(db_session, "select name from place where id = 'GHA'") == "Ghana"
+    ingest(db_session, ADAPTERS["wikidata"](), FakeFetcher(wikidata_routes()), store)
+    assert versions(db_session) == {"GHA": [1, 2], "MLI": [1, 2], "NER": [1]}
+
+
+@pytest.mark.db
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "update place_version set digest = 'x'",
+        "delete from place_version",
+        "truncate place_version",
+    ],
+)
+def test_place_version_refuses_update_delete_and_truncate(db_session: Session, sql: str) -> None:
+    seed_places(db_session)
+    refused(db_session, sql)
+    assert scalar(db_session, "select count(*) from place_version") == 3
+
+
+@pytest.mark.db
+def test_resolver_digest_never_raises_and_changes_with_a_place_name(db_session: Session) -> None:
+    empty = canary.geo.resolver_digest(db_session)
+    assert len(empty) == 64
+    seed_places(db_session)
+    full = canary.geo.resolver_digest(db_session)
+    assert full != empty and canary.geo.resolver_digest(db_session) == full
+    db_session.execute(text("update place set name = 'Gold Coast' where id = 'GHA'"))
+    assert canary.geo.resolver_digest(db_session) not in (empty, full)
+
+
+@pytest.mark.db
+def test_run_config_digest_includes_the_resolver_only_for_resolver_adapters(
+    db_session: Session, store: RawStore
+) -> None:
+    seed_places(db_session)
+    register(db_session, "vdem-ert")
+    register(db_session, "ucdp-candidate")
+
+    def digests() -> list[str]:
+        return [
+            r.config_digest
+            for r in db_session.execute(
+                text(
+                    "select config_digest from pipeline_run where config_digest <> 'seed' "
+                    "order by started_at"
+                )
+            )
+        ]
+
+    ingest(db_session, ADAPTERS["vdem-ert"](), FakeFetcher(ert_routes()), store)
+    ingest(db_session, ADAPTERS["ucdp-candidate"](), FakeFetcher(candidate_routes()), store)
+    db_session.execute(text("update place set name = 'Gold Coast' where id = 'GHA'"))
+    ingest(db_session, ADAPTERS["vdem-ert"](), FakeFetcher(ert_routes()), store)
+    ingest(db_session, ADAPTERS["ucdp-candidate"](), FakeFetcher(candidate_routes()), store)
+    ert1, ucdp1, ert2, ucdp2 = digests()
+    assert ert1 == ert2 == ADAPTERS["vdem-ert"]().config_digest()
+    assert ucdp1 != ADAPTERS["ucdp-candidate"]().config_digest()
+    assert ucdp1 != ucdp2
+
+
+@pytest.mark.db
+def test_unmapped_names_are_recorded_in_the_health_message_and_ok_stays_true(
+    db_session: Session, store: RawStore
+) -> None:
+    seed_places(db_session)
+    register(db_session, "ucdp-candidate")
+    ingest(db_session, ADAPTERS["ucdp-candidate"](), FakeFetcher(candidate_routes()), store)
+    health = db_session.execute(text("select ok, message from source_health")).one()
+    assert (health.ok, health.message) == (True, "unmapped: 1")
+
+
+@pytest.mark.db
+def test_file_refs_carry_the_url_each_file_came_from(db_session: Session, store: RawStore) -> None:
+    seed_places(db_session)
+    register(db_session, "vdem-ert")
+    ingest_ert(db_session, store)
+    refs = one(db_session, "select file_refs from dataset_release")
+    by_name = {r["filename"]: r for r in refs}
+    assert by_name["ert.csv"]["url"].endswith("inst/ert.csv")
+    assert all(r["url"].startswith("https://") for r in refs)

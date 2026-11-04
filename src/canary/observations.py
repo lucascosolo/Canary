@@ -27,6 +27,7 @@ COUNTED_TABLES = (
     "observation",
     "pipeline_run",
     "place",
+    "place_version",
     "source",
     "source_health",
     "source_version",
@@ -50,7 +51,7 @@ class IndicatorSpec:
             raise ValueError(f"deterioration_direction must be one of {DIRECTIONS}")
 
 
-def sync_indicator(session: Session, spec: IndicatorSpec) -> int:
+def sync_indicator(session: Session, spec: IndicatorSpec, *, run_id: uuid.UUID) -> int:
     record = asdict(spec)
     digest = hashlib.sha256(
         json.dumps(record, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -85,6 +86,7 @@ def sync_indicator(session: Session, spec: IndicatorSpec) -> int:
             record=record,
             digest=digest,
             recorded_at=datetime.datetime.now(datetime.UTC),
+            run_id=run_id,
         )
     )
     return version
@@ -161,7 +163,7 @@ LATEST_SQL = text(
     ) as k(indicator_id, geo_ref, period_start, period_end)
       on o.indicator_id = k.indicator_id and o.geo_ref = k.geo_ref
      and o.period_start = k.period_start and o.period_end = k.period_end
-    order by o.indicator_id, o.geo_ref, o.period_start, o.period_end, o.retrieved_at desc
+    order by o.indicator_id, o.geo_ref, o.period_start, o.period_end, o.retrieved_at desc, o.id desc
     """
 )
 
@@ -187,10 +189,16 @@ def _latest_values(
 
 
 def write_observations(
-    session: Session, release_id: uuid.UUID, run_id: uuid.UUID, rows: Sequence[ObservationRow]
+    session: Session,
+    release_id: uuid.UUID,
+    run_id: uuid.UUID,
+    rows: Sequence[ObservationRow],
+    *,
+    at: datetime.datetime | None = None,
 ) -> WriteResult:
+    """Write the rows that differ from each key's newest vintage, stamped `at` or the release."""
     _validate(rows)
-    retrieved_at = session.execute(
+    retrieved_at = at or session.execute(
         select(dataset_release.c.retrieved_at).where(dataset_release.c.id == release_id)
     ).scalar_one()
     _ensure_partition(session, retrieved_at)
@@ -229,7 +237,7 @@ AS_OF_SQL = text(
         where indicator_id = :indicator_id
           and (cast(:as_of as timestamptz) is null or retrieved_at <= cast(:as_of as timestamptz))
           and (cast(:geo_ref as text) is null or geo_ref = cast(:geo_ref as text))
-        order by indicator_id, geo_ref, period_start, period_end, retrieved_at desc
+        order by indicator_id, geo_ref, period_start, period_end, retrieved_at desc, id desc
     ) latest
     order by geo_ref, period_start, period_end
     """

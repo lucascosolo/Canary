@@ -63,23 +63,26 @@ class WorldBank(Adapter):
         header, _ = _body(self._remember(fetcher, first), SERIES[0][0])
         if not header.get("lastupdated"):
             raise SchemaChanged("missing column lastupdated in the World Bank response")
-        urls = {"country.json": COUNTRY_URL}
-        urls.update({f"{code}.json": _series_url(code) for code, *_ in SERIES})
+        urls = {"country.page1.json": COUNTRY_URL}
+        urls.update({f"{code}.page1.json": _series_url(code) for code, *_ in SERIES})
         return ReleaseRef(str(header["lastupdated"]), urls)
 
-    def _pages(self, fetcher: Any, store: RawStore, stem: str, url: str) -> list[RawRef]:
+    def _pages(self, fetcher: Any, store: RawStore, ref: ReleaseRef, stem: str) -> list[RawRef]:
+        """Store every page, adding the later ones to ref.urls now that their count is known."""
+        url = ref.urls[f"{stem}.page1.json"]
         data = self._take(fetcher, url)
         pages = int(_body(data, stem)[0].get("pages") or 1)
         refs = [store.put(self.source_id, f"{stem}.page1.json", data)]
         for page in range(2, pages + 1):
-            data = fetcher.get(f"{url}&page={page}")
-            refs.append(store.put(self.source_id, f"{stem}.page{page}.json", data))
+            page_url = f"{url}&page={page}"
+            ref.urls[f"{stem}.page{page}.json"] = page_url
+            refs.append(store.put(self.source_id, f"{stem}.page{page}.json", fetcher.get(page_url)))
         return refs
 
     def fetch(self, fetcher: Any, ref: ReleaseRef, store: RawStore) -> list[RawRef]:
         refs = []
-        for name, url in ref.urls.items():
-            refs += self._pages(fetcher, store, name.removesuffix(".json"), url)
+        for name in list(ref.urls):
+            refs += self._pages(fetcher, store, ref, name.removesuffix(".page1.json"))
         return refs
 
     def parse(self, refs: Sequence[RawRef], resolver: Any) -> ParseResult:

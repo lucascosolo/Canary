@@ -25,6 +25,7 @@ from canary.observations import IndicatorSpec, ObservationRow
 from canary.rawstore import RawRef, RawStore
 
 csv.field_size_limit(sys.maxsize)
+MAX_ZIP_MEMBER_BYTES = 2_000_000_000
 
 
 @dataclass(frozen=True)
@@ -212,6 +213,9 @@ def only_csv_in_zip(data: bytes) -> bytes:
             ]
             if len(names) != 1:
                 raise SchemaChanged(f"expected one CSV in the zip, found {names}")
+            declared = archive.getinfo(names[0]).file_size
+            if declared > MAX_ZIP_MEMBER_BYTES:
+                raise SchemaChanged(f"{names[0]} in the zip declares {declared} bytes")
             return archive.read(names[0])
     except zipfile.BadZipFile as exc:
         raise SchemaChanged(f"not a zip file: {exc}") from exc
@@ -238,9 +242,16 @@ def page_link(
 ) -> tuple[str, re.Match[str]] | None:
     best: tuple[tuple[int, ...], str, re.Match[str]] | None = None
     html = page.decode("utf-8", errors="replace")
+    page_host = urllib.parse.urlsplit(page_url).hostname
     for href in re.findall(r"""href\s*=\s*["']([^"']+)["']""", html):
-        url = urllib.parse.urljoin(page_url, href)
-        match = pattern.search(urllib.parse.urlsplit(url).path)
+        try:
+            url = urllib.parse.urljoin(page_url, href)
+            parts = urllib.parse.urlsplit(url)
+        except ValueError:
+            continue
+        if parts.scheme not in ("https", "http") or parts.hostname != page_host:
+            continue
+        match = pattern.search(parts.path)
         if match is None:
             continue
         key = tuple(int(group) for group in match.groups())

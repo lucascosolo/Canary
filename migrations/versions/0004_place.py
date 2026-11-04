@@ -25,12 +25,28 @@ def upgrade() -> None:
         sa.Column("geonames_id", sa.Integer, nullable=False),
         sa.Column("wikidata_id", sa.Text),
         sa.Column("run_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("pipeline_run.id"), nullable=False),
+        sa.Column("current_version", sa.Integer, nullable=False),
+    )
+    op.create_table(
+        "place_version",
+        sa.Column("place_id", sa.Text, sa.ForeignKey("place.id"), nullable=False),
+        sa.Column("version", sa.Integer, nullable=False),
+        sa.Column("record", postgresql.JSONB, nullable=False),
+        sa.Column("digest", sa.Text, nullable=False),
+        sa.Column("run_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("pipeline_run.id"), nullable=False),
+        sa.Column("recorded_at", sa.DateTime(timezone=True), nullable=False),
+        sa.PrimaryKeyConstraint("place_id", "version"),
     )
 
+    each_row = "for each row execute function canary_refuse()"
     each_statement = "for each statement execute function canary_refuse()"
 
     op.execute("create trigger place_no_delete before delete on place " + each_statement)  # SAFETY-GUARD
     op.execute("create trigger place_no_truncate before truncate on place " + each_statement)  # SAFETY-GUARD
+
+    op.execute("create trigger place_version_no_update before update on place_version " + each_row)  # SAFETY-GUARD
+    op.execute("create trigger place_version_no_delete before delete on place_version " + each_statement)  # SAFETY-GUARD
+    op.execute("create trigger place_version_no_truncate before truncate on place_version " + each_statement)  # SAFETY-GUARD
 
 
 def downgrade() -> None:

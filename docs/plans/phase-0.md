@@ -42,7 +42,7 @@ for the user's own runs outside the sandbox.
 
 - **Phase 1:** the `document` schema, which `docs/10` listed under Phase 0; a `Fetcher` response object with status and content type;
   a feed runner that commits its run before fetching, so a crash cannot erase a record of paid LLM calls.
-- **Phase 2:** a partition job run by the owning database role, because on-demand partitions let the application role own them
+- **Phase 2:** a Cline `file_refs` URL that is a local drop path and must not reach any API; a partition job run by the owning database role, because on-demand partitions let the application role own them
   and briefly lock readers; `reference/` in the wheel; a build-stamped commit, since `git rev-parse` fails on the VPS; adapter
   `health()` probes and schedules (`docs/07`, section 3); merging editorial indicator fields; skipping a re-parse when files
   and config are unchanged, because UCDP GED and V-Dem exceed the worker's memory budget.
