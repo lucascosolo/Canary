@@ -469,7 +469,7 @@ def test_cli_ingest_prints_the_summary_line_and_returns_0(
     ]
     assert main(["ingest", "vdem-ert"]) == 0
     assert capsys.readouterr().out.splitlines() == [
-        "vdem-ert 15.0.1 existing written=0 unchanged=0 skipped=0 unmapped=0"
+        "vdem-ert 15.0.1 existing written=0 unchanged=7 skipped=0 unmapped=0"
     ]
 
 
