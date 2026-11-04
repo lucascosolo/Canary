@@ -1,0 +1,14 @@
+# PostgreSQL 17 for runs outside the agent sandbox, matching the utility VPS.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: canary
+      POSTGRES_DB: canary
+      POSTGRES_PASSWORD: ${CANARY_DB_PASSWORD:?set CANARY_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - canary-pg:/var/lib/postgresql/data
+volumes:
+  canary-pg:
