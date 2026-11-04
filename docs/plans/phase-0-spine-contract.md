@@ -93,3 +93,9 @@ naming the variable to stderr and returns 2.
 ## Out of scope
 
 Observations, indicators, adapters, `canary status`, a `document` table, database roles.
+
+## Settled after test authoring (2026-11-04)
+
+- An UPDATE on an open run that does not set `ended_at` is refused, even if it changes only `notes`.
+- `canary health` prints `last_ok_at` in ISO-8601 UTC.
+- The digest JSON uses `json.dumps(..., sort_keys=True, separators=(",", ":"))`.
