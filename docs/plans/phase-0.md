@@ -37,3 +37,14 @@ TCP on loopback and pg_trgm available. Options:
 
 Docker is not an option for agent sessions: the sandbox refuses its socket. `compose.yaml` remains
 for the user's own runs outside the sandbox.
+
+## Accepted gaps, each with the phase that closes it (from the review of 2026-11-04)
+
+- **Phase 1:** the `document` schema, which `docs/10` listed under Phase 0; a `Fetcher` response object with status and content type;
+  a feed runner that commits its run before fetching, so a crash cannot erase a record of paid LLM calls.
+- **Phase 2:** a partition job run by the owning database role, because on-demand partitions let the application role own them
+  and briefly lock readers; `reference/` in the wheel; a build-stamped commit, since `git rev-parse` fails on the VPS; adapter
+  `health()` probes and schedules (`docs/07`, section 3); merging editorial indicator fields; skipping a re-parse when files
+  and config are unchanged, because UCDP GED and V-Dem exceed the worker's memory budget.
+- **When a source first retracts something:** a marker for withdrawn values. Making `value` nullable is a cheap change later.
+- **Phase 4:** loading older releases, so as-of queries can reach before 2026-11-04.

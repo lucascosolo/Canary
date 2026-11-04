@@ -275,9 +275,20 @@ Alternative: drive a browser to fetch it, which would be getting around the refu
 
 ## 2026-11-04 — A known release is parsed again on every ingest
 
+Partly superseded: its statement that new rows carry the release's `retrieved_at` was wrong; see the entry "A row's retrieved_at is when Canary came to hold it" below.
+
 A release's digest covers only the downloaded files. Skipping parsing when the digest is known would strand rows: a country alias
 added later, or an indicator added to an adapter, would not load until the source published a new file, and a release row cannot be
 removed to force it. So the runner always re-parses, and vintage dedup writes only what is new. The new rows carry the release's
 `retrieved_at`: the data was public then, though Canary had not mapped it. Alternatives: put the alias file and adapter config in
 the content digest, which creates a false release for an unchanged file, or compare configs between runs, which adds state for
 the same result. Cost: parsing repeats on each poll, which matters only for V-Dem, whose schedule is weekly on the PC.
+
+## 2026-11-04 — A row's retrieved_at is when Canary came to hold it
+
+An independent review found that stamping re-parsed rows with the original release's time let an as-of query for date D change
+after D, which would add look-ahead to backtests and make Phase 2 signals irreproducible. Decision: a row written on a re-parse is
+stamped with that run's start, so `retrieved_at` means the moment Canary held the value. The source's own publication time stays
+reachable through the release. This also makes a source's rollback visible as a new vintage instead of hiding it. The reviewer
+proposed keeping the old stamp and filtering as-of queries on the run's start, which works but keeps two clocks for one fact and needs
+every future query to remember the second. Reopened by: Phase 4 loading older releases, which must state their own times.
