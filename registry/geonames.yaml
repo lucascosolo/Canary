@@ -9,10 +9,12 @@ countries: global
 languages:
 - en
 declared_cadence: Daily
+expected_lag_days: 180
 revision_policy: silent
 access_method: Bulk download (allCountries.zip and per-country files)
 endpoint: https://download.geonames.org/export/dump/
 auth: none
+adapter: canary.adapters.reference:geonames
 licence_id: CC-BY-3.0
 terms_url: https://www.geonames.org/export/
 terms_verified_on: 2026-10-20
@@ -21,5 +23,6 @@ attribution_text: 'Data: GeoNames, https://www.geonames.org/'
 redistribution_notes: Credit GeoNames with a link; commercial use allowed; data is as is.
 source_class: platform
 quality_notes: 'Data is as is. Free web services (not used): 10,000 credits a day, 1,000 an hour per username.'
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04

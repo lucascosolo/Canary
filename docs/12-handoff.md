@@ -30,7 +30,13 @@ re-run the discovery: the research notes and the specification are the record.
   has no upstream entry until the user sets one outside it.
 - Phase 0 plan and chunk status: `docs/plans/phase-0.md`.
 
-## First implementation objective: Phase 0
+## Status, 2026-11-04
+
+Phase 0 is built and its evidence is in `docs/evaluations/phase-0-acceptance.md`. `canary db start` runs the private
+server, `canary registry sync` then `canary ingest <source>` load data, with geonames first. Sandboxed commands need the
+source's host in `allowed_domains`. The server does not survive between commands, so start and stop it within one.
+
+## First implementation objective: Phase 0 (done; kept for the record)
 
 Deliver the ingestion spine on this PC (document 10, Phase 0). Suggested chunking for fresh
 implementer sessions, each with a contract and tests written first by `test-author`:

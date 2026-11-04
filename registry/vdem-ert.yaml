@@ -9,10 +9,12 @@ countries: global
 languages:
 - en
 declared_cadence: Annual, with each V-Dem release
+expected_lag_days: 400
 revision_policy: silent
 access_method: GitHub raw CSV, linked from V-Dem's ERT page
 endpoint: https://raw.githubusercontent.com/vdeminstitute/ERT/master/inst/ert.csv
 auth: none
+adapter: canary.adapters.vdem:vdem-ert
 licence_id: GPL-3.0-only
 terms_url: https://raw.githubusercontent.com/vdeminstitute/ERT/master/DESCRIPTION
 terms_verified_on: 2026-11-04
@@ -24,5 +26,6 @@ redistribution_notes: The package licence is GPL-3 and the page states no separa
 source_class: academic
 quality_notes: Codebook variables to confirm. Licence not found for ERT itself in notes A-01 and G-04;
   the catalog's open (inherits V-Dem) is an inference.
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04

@@ -23,3 +23,9 @@ in on 2026-11-04 as working values. Treat them as unverified until a dated note 
 
 Entries with `canary_use: unverified` may be shown only as links (`docs/03`, section 8). On 2026-11-04
 these are `keepiton`, `global-legal-monitor` and `iso-3166`; notes H-03, H-04 and H-05 record why.
+
+## Staleness allowances
+
+`expected_lag_days` on integrated sources is Canary's own allowance before `canary health` calls a source
+stale, set on 2026-11-04 from each source's stated cadence. It is not a figure the source publishes, and
+it will be revised from observed behaviour once scheduling exists in Phase 2.

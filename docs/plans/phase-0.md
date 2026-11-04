@@ -8,8 +8,8 @@ Acceptance is in `docs/10`, Phase 0. Chunks follow `docs/12`, cut by what can be
 | registry | Registry YAML format, validating loader, `canary registry validate`, entries for the P0 sources | `uv run pytest`; `uv run canary registry validate` | no | complete |
 | spine | `pipeline_run`, `source`, `source_version`, `source_health`, `dataset_release`; `canary health` | `db` tests | yes | complete |
 | observations | `indicator`, partitioned `observation`, `baseline`; as-of helper; vintage dedup; reproducibility test | `db` tests | yes | complete |
-| adapters | V-Dem Country-Year and ERT; UCDP bulk; World Bank; Our World in Data; EWP SRA and Cline coups; reference loads | each adapter ingests, a re-run adds no rows | yes for acceptance | blocked |
-| status | `canary status`; acceptance evidence committed | `docs/10` acceptance list | yes | blocked |
+| adapters | V-Dem Country-Year and ERT; UCDP bulk; World Bank; Our World in Data; EWP SRA and Cline coups; reference loads | each adapter ingests, a re-run adds no rows | yes for acceptance | complete except Cline, which waits for the file |
+| status | `canary status`; acceptance evidence committed | `docs/10` acceptance list | yes | complete; evidence in `docs/evaluations/phase-0-acceptance.md` |
 
 ## What the terms re-check changed (notes H-03 and H-04, 2026-11-04)
 

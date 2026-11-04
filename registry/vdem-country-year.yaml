@@ -11,11 +11,13 @@ countries: global
 languages:
 - en
 declared_cadence: Annual, March
+expected_lag_days: 400
 revision_policy: silent
 access_method: GitHub raw file from V-Dem's own R package; the website CSV sits behind a personal-data
   form, which is not used (note H-05)
 endpoint: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
 auth: none
+adapter: canary.adapters.vdem:vdem-country-year
 licence_id: CC-BY-SA-4.0
 terms_url: https://v-dem.net/data/the-v-dem-dataset/
 terms_verified_on: 2026-10-20
@@ -25,5 +27,6 @@ redistribution_notes: 'CC BY-SA 4.0: derivatives must be shared under the same l
 source_class: academic
 quality_notes: Expert-coded; one-year lag; uncertainty intervals should be shown. Parsing needs about
   2 GB of memory, so it runs on the PC and not on the utility VPS.
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04

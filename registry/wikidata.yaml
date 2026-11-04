@@ -9,9 +9,11 @@ countries: global
 languages:
 - en
 declared_cadence: Continuous
+expected_lag_days: 180
 revision_policy: silent
 access_method: Entity data and query service
 auth: none
+adapter: canary.adapters.reference:wikidata
 licence_id: CC0-1.0
 terms_url: https://www.wikidata.org/wiki/Wikidata:Licensing
 terms_verified_on: 2026-10-20
@@ -21,5 +23,6 @@ redistribution_notes: Main, Property, Lexeme and EntitySchema namespaces are CC0
   CC BY-SA 4.0.
 source_class: platform
 quality_notes: Open community editing; historical coverage of event properties unchecked.
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04

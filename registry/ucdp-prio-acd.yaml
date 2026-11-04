@@ -9,10 +9,12 @@ countries: global
 languages:
 - en
 declared_cadence: Annual (cadence not stated on the download page)
+expected_lag_days: 400
 revision_policy: silent
 access_method: Bulk ZIP/CSV download
 endpoint: https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip
 auth: none
+adapter: canary.adapters.ucdp:ucdp-prio-acd
 licence_id: CC-BY-4.0
 terms_url: https://ucdp.uu.se/downloads/
 terms_verified_on: 2026-10-20
@@ -21,5 +23,6 @@ attribution_text: 'Data: Uppsala Conflict Data Program (UCDP) and PRIO, UCDP/PRI
 source_class: academic
 quality_notes: Conflict-year data, 1946-2025, where at least one party is a state government. Threshold
   and media dependence as UCDP.
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04

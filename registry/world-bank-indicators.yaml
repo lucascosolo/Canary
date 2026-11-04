@@ -9,11 +9,13 @@ countries: global
 languages:
 - en
 declared_cadence: Quarterly (WDI)
+expected_lag_days: 120
 revision_policy: silent
 access_method: REST API v2, JSON, no key
 endpoint: https://api.worldbank.org/v2/
 auth: none
 rate_limit_text: No documented rate limit.
+adapter: canary.adapters.worldbank:world-bank-indicators
 licence_id: CC-BY-4.0
 terms_url: https://datacatalog.worldbank.org/public-licenses
 terms_verified_on: 2026-10-20
@@ -23,5 +25,6 @@ redistribution_notes: CC BY 4.0 is the default for World Bank-produced datasets;
   catalog entry for exceptions (ODbL, externally specified, custom).
 source_class: intergovernmental
 quality_notes: No documented rate limit; licence varies by dataset.
-status: evaluated
+status: integrated
 evaluated_on: 2026-10-20
+integrated_on: 2026-11-04
