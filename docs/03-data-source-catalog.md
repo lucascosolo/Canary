@@ -131,8 +131,9 @@ layers in document 04:
    strike this item, in which case OONI and #KeepItOn carry the role).
 7. ReliefWeb is withdrawn: its API requires a pre-approved app name (B-06). Humanitarian
    context comes from the open datasets above and from NGO feeds under their own terms.
-8. **A curated RSS list** of roughly 200 outlets and NGO feeds spanning every region and at least
-   twelve languages, plus the Global Legal Monitor feed: the document layer for claim extraction.
+8. **A curated RSS list** of roughly 200 outlets and NGO feeds spanning every region and as many
+   languages as the coverage index requires (readers see English; decision of 2026-11-04), plus
+   the Global Legal Monitor feed: the document layer for claim extraction.
    The list itself is a versioned file in the repository with a reason and a language for each
    entry, and it is the first thing the coverage index measures.
 9. **Reference data**: GeoNames, Wikidata, Natural Earth, ISO codes.

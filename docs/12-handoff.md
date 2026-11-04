@@ -6,7 +6,8 @@ re-run the discovery: the research notes and the specification are the record.
 
 ## What has been decided
 
-- Product: a free, public, non-profit, evidence-first monitor; no composite scores; no
+- Product: a free, friends-only, evidence-first monitor with an English-only interface over
+  sources in many languages (2026-11-04); no composite scores; no
   autonomous publication; three layers shown side by side (documents 01 and 04).
 - Audience: the user and friends, behind Cloudflare Access at `canary.lucascosolo.com`, hosted
   on the existing utility VPS from Phase 2 with heavy steps on this PC; no new spend; no legal

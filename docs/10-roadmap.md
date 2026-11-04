@@ -42,8 +42,8 @@ entry per decision taken during the phase.
 Objective: the text pipeline from feeds to validated claims, measured against a gold set, within
 a measured cost.
 
-Delivers: the curated feed list (about 200 outlets and NGO feeds, at least twelve languages, each
-entry with a reason) as a versioned file; feed, GDELT DOC (volume and URL discovery), OONI,
+Delivers: the curated feed list (about 200 outlets and NGO feeds spanning regions and languages as
+coverage requires, each entry with a reason; the interface stays English, 2026-11-04) as a versioned file; feed, GDELT DOC (volume and URL discovery), OONI,
 #KeepItOn and, if the user keeps it, Cloudflare Radar adapters; the fetcher with robots.txt,
 reuse-reservation and `licence_mode` handling, in-memory processing of article bodies with no
 full-text retention, and Internet Archive save-on-cite; normalisation (trafilatura, Lingua, courlan,
@@ -59,7 +59,7 @@ Prerequisites: Phase 0; the Anthropic API key in a mode-600 env file (user decis
 2026-10-20 covers use; the key is the user's to place). No external requests.
 
 Major decisions in-phase: extraction model tier per claim type from the measurements; which
-languages make tier two; the lineage threshold.
+non-English languages get a translated gold set first; the lineage threshold.
 
 Difficulties: feed churn and paywalls; non-English gold sets (operator time); keeping extraction
 spend inside the cap while the feed list is tuned; GDELT duplication.
@@ -139,8 +139,8 @@ Objective: know how well the signals and rules would have done, publish it, and 
 Delivers: the as-of replay harness (vintage queries, GDELT date-bounded discovery, Internet
 Archive captures); backtests on twelve episodes and ten stable years with detection probability,
 lead time, false-alarm ratio and precision-recall per rule and method; rule tuning with every
-change logged; the symmetry and ablation tests; language tiers two and three with their gold
-sets; the keyless legislative sources (EUR-Lex SPARQL, Brazil's Câmara API, the French Assembly's
+change logged; the symmetry and ablation tests; further non-English gold sets, coded from
+translations (decision of 2026-11-04); the keyless legislative sources (EUR-Lex SPARQL, Brazil's Câmara API, the French Assembly's
 open data) and the `legislation` entity; ViEWS and EWP shown as external models with their
 precision; JSON-LD export of the episode library; saved searches and watchlists for the operator;
 optional semantic search with embeddings computed on this PC if full-text search proves

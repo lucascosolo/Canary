@@ -132,3 +132,22 @@ permission, access or tokens from any entity; do nothing that risks legal troubl
   Node).
 - Risk 3 (licence breach) is reduced by the no-credentials rule: every integrated source is
   explicitly licensed and usable without asking, and everything else is a link.
+
+## 5. Revision of 2026-11-04: development begins; English-only readers
+
+The user approved autonomous development (DECISIONS.md, 2026-11-04) and decided that readers
+are English-only while sources stay multilingual. Effects on this document:
+
+- Resolved: question 5 (scope emphasis: global, with the feed list spanning regions and
+  languages as coverage requires and the interface in English only) and question 10 (the remote
+  exists and `main` is pushed by URL).
+- Proceeding on provisional defaults recorded in DECISIONS.md: question 2 (spend cap $50 a
+  month, enforced in code; no LLM call before the user's yes at Phase 1), 6 (editorial policy as
+  written), 7 (Apache 2.0 and CC BY-SA 4.0), 9 (the name Canary). The Cloudflare Radar token is
+  out by default.
+- Risk 1's media-lawyer item and risk 12's public-site abuse item are moot for a friends-only
+  tool behind Cloudflare Access; both stay listed in case the audience ever widens.
+- Risk 2's residual ("gold sets for many languages need operator time") is now also a method
+  limit: non-English gold sets are coded from translations (docs/09, section 3).
+- Development-environment constraint found on 2026-11-04: the agent sandbox cannot reach the
+  Docker socket, so the test suite starts its own PostgreSQL from a PyPI package (DECISIONS.md).

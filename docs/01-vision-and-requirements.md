@@ -23,7 +23,9 @@ open, cross-domain, evidence-showing monitor with a documented methodology (note
 
 ## 2. What Canary is
 
-Canary is a public, free, non-profit situational-awareness system. It monitors indicators of
+Canary is a free situational-awareness system built by one person for a few friends, with no
+commercial intent (revised 2026-11-04; the earlier public, non-profit framing is recorded in
+`DECISIONS.md`). Its interface is English only; its sources are not. It monitors indicators of
 democratic erosion, repression, conflict escalation, information control, economic stress and,
 equally, institutional resilience and de-escalation, across every country; it places each
 development in its country's own baseline and in documented historical context; and it shows,

@@ -28,10 +28,13 @@ shift is either news or a broken parser, and the operator decides which).
 ## 3. Extraction validation (the measurement instrument)
 
 A **gold set** of hand-coded documents is built before extraction is switched on for a
-language tier: at least 300 documents for English, 150 each for the next tier (Spanish, French,
-Arabic, Russian, Portuguese, to be confirmed against the feed list), 100 for each further
-language, stratified by source class and domain, coded by the operator with the codebook and a
-second pass for a 20% subsample to measure inter-coder agreement (reported, not hidden). For
+language tier: at least 300 documents for English and 100 for each further language that carries a
+material share of the feed list, stratified by source class and domain, coded by the operator
+with the codebook. The operator reads only English (decision of 2026-11-04), so a non-English
+document is coded from a full English translation produced for the gold set alone and not
+retained; span fidelity is checked mechanically against the original text; and the translation
+step is measured separately by back-translation agreement, reported with its own number and
+labelled as weaker than native coding. A second pass for a 20% subsample to measure inter-coder agreement (reported, not hidden). For
 each model version and prompt version, report per claim type: precision, recall, F1 for claim
 presence; accuracy for actor class, target class, place, time; span fidelity (the quoted span
 exists verbatim and supports the claim, judged by hand); the codebook-following check from He

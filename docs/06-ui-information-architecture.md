@@ -114,7 +114,7 @@ cannot see.
 Full-text and structured search across claims, events, assessments, episodes and sources, with
 filters for country, date range, domain, source class, evidence category, confidence, and
 language of the original document. Results keep the original-language title and show the
-translation beside it. Saved searches and watchlists are a Phase 4 feature for the operator
+English translation beside it; the interface itself is English only (decision of 2026-11-04). Saved searches and watchlists are a Phase 4 feature for the operator
 first; readers get shareable URLs for any filtered view in Phase 2.
 
 ### 3.9 Methodology, calibration and corrections
