@@ -1,0 +1,7 @@
+# GeoNames.org Country Information
+# Invented rows for tests.
+#
+#ISO	ISO3	ISO-Numeric	fips	Country	Capital	Area(in sq km)	Population	Continent	tld	CurrencyCode	CurrencyName	Phone	Postal Code Format	Postal Code Regex	Languages	geonameid	neighbours	EquivalentFips
+GH	GHA	288	GH	Ghana	Accra	1	1	AF	.gh	XXX	Unit	1			en	2300660		
+ML	MLI	466	ML	Mali	Bamako	1	1	AF	.ml	XXX	Unit	1			en	2453866		
+NE	NER	562	NE	Niger	Niamey	1	1	AF	.ne	XXX	Unit	1			en	2440476		

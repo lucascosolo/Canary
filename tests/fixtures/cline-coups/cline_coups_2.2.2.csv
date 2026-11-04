@@ -1,0 +1,6 @@
+cowcode,country,coup_id,year,month,day,event_type,realized,unrealized,conspiracy,attempt,military,dissident,rebel,palace,foreign,auto,resign,popular,counter,other,noharm,injured,killed,harrest,jailed,tried,fled,exile
+,Ghana,1,1979,,,,1,,0,0,,,,,,,,,,,,,,,,,,
+,Ghana,2,1979,,,,0,,1,1,,,,,,,,,,,,,,,,,,
+,Ghana,3,1981,,,,1,,0,0,,,,,,,,,,,,,,,,,,
+,Mali,4,1968,,,,1,,0,0,,,,,,,,,,,,,,,,,,
+,Atlantis,5,1970,,,,1,,0,0,,,,,,,,,,,,,,,,,,
