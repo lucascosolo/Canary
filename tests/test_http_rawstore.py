@@ -18,9 +18,23 @@ UA = "canary-personal-tool"
 
 class Handler(http.server.BaseHTTPRequestHandler):
     requests: list[tuple[str, str | None]] = []
+    location = ""
 
     def do_GET(self) -> None:  # noqa: N802
         type(self).requests.append((self.path, self.headers.get("User-Agent")))
+        path = self.path.split("?")[0]
+        if path == "/redirect":
+            self.send_response(302)
+            self.send_header("Location", type(self).location)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        if path == "/badlength":
+            self.send_response(200)
+            self.send_header("Content-Length", "abc")
+            self.end_headers()
+            self.wfile.write(b"hello")
+            return
         status = {"/ok": 200, "/401": 401, "/403": 403, "/451": 451, "/500": 500}.get(
             self.path.split("?")[0], 404
         )
@@ -143,3 +157,35 @@ def test_default_root_comes_from_canary_raw_dir(
     monkeypatch.setenv("CANARY_RAW_DIR", str(tmp_path / "rawdir"))
     ref = RawStore().put("src-x", "d.txt", b"x")
     assert pathlib.Path(ref.path).is_relative_to(tmp_path / "rawdir")
+
+
+# --- review fixes: only HTTP and HTTPS ---------------------------------------
+
+
+def test_file_url_is_refused_without_reading_the_file(tmp_path: pathlib.Path) -> None:
+    target = tmp_path / "secret.txt"
+    target.write_text("secret")
+    with pytest.raises(FetchFailed):
+        Fetcher().get(target.as_uri())
+
+
+def test_ftp_url_is_refused() -> None:
+    with pytest.raises(FetchFailed):
+        Fetcher().get("ftp://127.0.0.1:1/file.csv")
+
+
+@pytest.mark.parametrize("scheme", ["file", "ftp"])
+def test_redirect_to_a_non_http_scheme_is_refused(
+    server: str, tmp_path: pathlib.Path, scheme: str
+) -> None:
+    target = tmp_path / "secret.txt"
+    target.write_text("secret")
+    Handler.location = target.as_uri() if scheme == "file" else "ftp://127.0.0.1:1/secret.txt"
+    with pytest.raises(FetchFailed):
+        Fetcher().get(f"{server}/redirect")
+    assert [path for path, _ in Handler.requests] == ["/redirect"]
+
+
+def test_malformed_content_length_is_fetch_failed_not_value_error(server: str) -> None:
+    with pytest.raises(FetchFailed):
+        Fetcher().get(f"{server}/badlength")

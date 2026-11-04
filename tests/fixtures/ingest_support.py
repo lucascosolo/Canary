@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import importlib
+import json
 import pathlib
 import re
 import uuid
@@ -101,16 +102,35 @@ PLACES = [
 ]
 
 
-def seed_places(session: Session) -> None:
+def add_place(session: Session, iso3: str, iso2: str, name: str, geonames_id: int = 1) -> None:
+    """A place at version 1, with its place_version row, as a GeoNames ingest would leave it."""
     run_id = start_run(session, "ingest", code_commit="seed", config_digest="seed")
-    for iso3, iso2, name, continent, geonames_id in PLACES:
-        session.execute(
-            text(
-                "insert into place (id, iso2, name, continent, geonames_id, run_id) "
-                "values (:i, :i2, :n, :c, :g, :r)"
-            ),
-            {"i": iso3, "i2": iso2, "n": name, "c": continent, "g": geonames_id, "r": run_id},
-        )
+    record = {
+        "iso2": iso2,
+        "name": name,
+        "continent": "AF",
+        "geonames_id": geonames_id,
+        "wikidata_id": None,
+    }
+    session.execute(
+        text(
+            "insert into place (id, iso2, name, continent, geonames_id, run_id, current_version) "
+            "values (:i, :i2, :n, 'AF', :g, :r, 1)"
+        ),
+        {"i": iso3, "i2": iso2, "n": name, "g": geonames_id, "r": run_id},
+    )
+    session.execute(
+        text(
+            "insert into place_version (place_id, version, record, digest, run_id, recorded_at) "
+            "values (:i, 1, cast(:rec as jsonb), :d, :r, now())"
+        ),
+        {"i": iso3, "rec": json.dumps(record), "d": "seed-" + iso3, "r": run_id},
+    )
+
+
+def seed_places(session: Session) -> None:
+    for iso3, iso2, name, _continent, geonames_id in PLACES:
+        add_place(session, iso3, iso2, name, geonames_id)
 
 
 def register(session: Session, source_id: str, canary_use: str = "open") -> None:
@@ -219,3 +239,21 @@ def row_set(result: Any) -> set[tuple[Any, ...]]:
         )
         for r in result.rows
     }
+
+
+def ert_variant_routes(version: str, aut_ghana_2020: str) -> list[Route]:
+    """ERT files whose one GHA 2020 aut_ep value and DESCRIPTION version are chosen by the test."""
+    import csv
+    import io
+
+    rows = list(csv.reader(io.StringIO(fixture("vdem-ert", "ert.csv").decode())))
+    header = rows[0]
+    for r in rows[1:]:
+        if r[header.index("country_text_id")] == "GHA" and r[header.index("year")] == "2020":
+            r[header.index("aut_ep")] = aut_ghana_2020
+    out = io.StringIO()
+    csv.writer(out, lineterminator="\n").writerows(rows)
+    return [
+        ("ERT/master/DESCRIPTION", f"Package: ERT\nVersion: {version}\n".encode()),
+        ("inst/ert.csv", out.getvalue().encode()),
+    ]
