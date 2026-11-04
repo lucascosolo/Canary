@@ -30,7 +30,7 @@ packages = ["src/canary"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--junitxml=reports/junit.xml -ra"
-markers = ["db: needs a real PostgreSQL named by CANARY_TEST_DATABASE_URL"]
+markers = ["db: needs a real PostgreSQL; see tests/conftest.py"]
 
 [tool.ruff]
 line-length = 100

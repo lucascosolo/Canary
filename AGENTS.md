@@ -51,6 +51,8 @@ do not start building the system.
 - Run tools with `UV_CACHE_DIR=$HOME/.cache/uv UV_PYTHON_INSTALL_DIR=$HOME/.cache/uv/python`. Tests:
   `uv run pytest`, which writes `reports/junit.xml`.
 - The sandbox refuses the Docker socket and Unix sockets. TCP on 127.0.0.1 works. Tests that need
-  PostgreSQL carry the `db` marker and skip when `CANARY_TEST_DATABASE_URL` is unset.
+  PostgreSQL carry the `db` marker and start a throwaway server from `/usr/lib/postgresql/17/bin`
+  (installed from PGDG by the user, 2026-11-04). They skip only if those binaries are missing and
+  `CANARY_TEST_DATABASE_URL` is unset.
 - Push with a bare `git push origin main` as its own command. The sandbox cannot write `.git/config`.
 - Current Phase 0 status is in `docs/plans/phase-0.md`, and each source's terms are in `registry/`.
